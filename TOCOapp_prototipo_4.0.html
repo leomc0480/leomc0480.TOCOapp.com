@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grupo Tocollanta — TOCOapp (Prototipo)</title>
+<style>
+  :root{
+    --orange:#F7A600; --orange-dark:#D98C00; --black:#141414; --charcoal:#232323;
+    --grey:#5a5a5a; --lightgrey:#f4f4f4; --border:#e2e2e2; --white:#ffffff;
+    --green:#25D366; --radius:4px; --neon:#12E0E0;
+    --bg-main:#f4f4f4; --bg-panel:#ffffff; --text-main:#141414; --text-sub:#5a5a5a;
+  }
+  [data-theme="dark"]{
+    --bg-main:#0c0c0c; --bg-panel:#1a1a1a; --text-main:#f2f2f2; --text-sub:#9a9a9a;
+    --border:#2c2c2c; --lightgrey:#151515; --orange:#F7A600; --neon:#12E0E0;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Segoe UI',Arial,sans-serif;color:var(--black);background:var(--white);}
+  h1,h2,h3,h4{font-family:inherit;font-weight:800;margin:0;}
+  a{text-decoration:none;color:inherit;}
+  button{font-family:inherit;cursor:pointer;}
+  .hidden{display:none !important;}
+  input,select{font-family:inherit;}
+
+  /* ---------- TOP BAR / HEADER / NAV (public) ---------- */
+  .topbar{background:var(--black);color:#ddd;font-size:12.5px;display:flex;justify-content:space-between;align-items:center;padding:6px 24px;flex-wrap:wrap;gap:6px;}
+  .topbar-right{display:flex;align-items:center;gap:10px;}
+  .topbar-right .icon{background:var(--orange);color:#111;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;border-radius:2px;font-size:11px;font-weight:700;}
+  .cotiza-btn{background:transparent;border:1px solid #666;color:#eee;padding:4px 10px;font-size:12px;}
+  .header{display:flex;justify-content:space-between;align-items:center;padding:14px 24px;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--border);}
+  .logo{font-weight:900;font-size:22px;line-height:1;}
+  .logo span{display:block;color:var(--orange);font-size:22px;}
+  .header-info{display:flex;gap:26px;font-size:12.5px;color:var(--grey);flex-wrap:wrap;}
+  .header-info div{display:flex;align-items:flex-start;gap:6px;}
+  .header-info b{display:block;color:var(--black);font-size:12.5px;}
+  .badge{background:var(--orange);color:#111;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+  .nav{background:var(--black);}
+  .nav ul{list-style:none;display:flex;margin:0;padding:0 24px;gap:22px;flex-wrap:wrap;}
+  .nav a{color:#fff;font-size:13.5px;font-weight:600;padding:13px 0;display:inline-block;cursor:pointer;}
+  .nav a.active,.nav a:hover{color:var(--orange);}
+  .nav .nav-right{margin-left:auto;display:flex;gap:16px;}
+  .nav .nav-right a{color:var(--orange);}
+
+  .hero{position:relative;background:linear-gradient(90deg, var(--orange) 0%, var(--orange) 42%, #1a1a1a 42%, #1a1a1a 100%);color:#111;padding:60px 24px;min-height:320px;display:flex;align-items:center;}
+  .hero-content{max-width:430px;}
+  .hero h1{font-size:32px;margin-bottom:14px;}
+  .hero p{font-size:14px;line-height:1.6;margin-bottom:22px;max-width:360px;}
+  .hero-buttons{display:flex;gap:10px;flex-wrap:wrap;}
+  .btn{padding:11px 20px;font-size:13px;font-weight:700;border:none;border-radius:2px;}
+  .btn-sm{padding:7px 12px;font-size:12px;}
+  .btn-dark{background:#111;color:#fff;}
+  .btn-outline{background:transparent;border:2px solid #111;color:#111;}
+  .btn-outline-light{background:transparent;border:1px solid var(--border);color:var(--text-main);}
+  .btn-orange{background:var(--orange);color:#111;}
+  .btn-grey{background:#eee;color:#444;}
+
+  .section{padding:44px 24px;max-width:1100px;margin:0 auto;}
+  .section-title{text-align:center;font-size:24px;margin-bottom:6px;}
+  .section-sub{text-align:center;color:var(--grey);font-size:13px;margin-bottom:26px;}
+  .rule{width:60px;height:3px;background:var(--orange);margin:10px auto 26px;}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  @media(max-width:800px){.grid3,.grid4{grid-template-columns:1fr 1fr;}}
+  .card{border:1px solid var(--border);border-radius:var(--radius);padding:20px;background:#fff;}
+  .card h4{font-size:15px;margin-bottom:8px;}
+  .card p{font-size:13px;color:var(--grey);line-height:1.5;margin:0;}
+  .brand-card{border:1px solid var(--border);border-radius:var(--radius);padding:22px 10px;text-align:center;font-weight:800;font-size:14px;background:#fff;}
+  .wa-btn{position:fixed;bottom:22px;left:22px;background:var(--green);color:#fff;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:50;}
+
+  /* ---------- MODALS ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;z-index:200;}
+  .modal{background:#fff;border-radius:6px;max-width:580px;width:100%;overflow:hidden;}
+  .modal-head{background:var(--black);color:#fff;padding:16px 22px;display:flex;justify-content:space-between;align-items:center;}
+  .modal-head h3{font-size:16px;}
+  .modal-close{background:none;border:none;color:#fff;font-size:20px;}
+  .modal-body{padding:22px;max-height:70vh;overflow-y:auto;}
+  .modal-body label{display:block;font-size:12px;font-weight:700;margin:14px 0 5px;color:var(--grey);}
+  .modal-body input,.modal-body select{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:4px;font-size:13.5px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .helper{font-size:11.5px;color:#999;margin-top:4px;}
+  .tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:4px;}
+  .tab{flex:1;text-align:center;padding:10px;font-size:13px;font-weight:700;color:var(--grey);cursor:pointer;border-bottom:3px solid transparent;}
+  .tab.active{color:var(--black);border-color:var(--orange);}
+
+  .steps{display:flex;gap:6px;margin-bottom:20px;}
+  .step-dot{flex:1;height:5px;background:var(--border);border-radius:3px;}
+  .step-dot.done{background:var(--orange);}
+  .service-opt{border:1px solid var(--border);border-radius:4px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer;font-size:13.5px;}
+  .service-opt.selected{border-color:var(--orange);background:#FFF7E8;}
+  .service-opt span.time{color:var(--grey);font-size:12px;}
+  .slot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;}
+  .slot{border:1px solid var(--border);text-align:center;padding:8px 4px;border-radius:4px;font-size:12.5px;cursor:pointer;}
+  .slot.busy{background:#f2f2f2;color:#bbb;cursor:not-allowed;text-decoration:line-through;}
+  .slot.selected{background:var(--orange);color:#111;border-color:var(--orange);font-weight:700;}
+  .summary-box{background:var(--lightgrey);border-radius:4px;padding:14px 16px;font-size:13px;line-height:1.7;margin-top:16px;color:var(--text-main);}
+  .summary-box b{color:var(--text-main);}
+  .est-time{display:inline-block;background:var(--orange);color:#111;padding:2px 8px;border-radius:3px;font-weight:700;}
+  .modal-footer{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;}
+
+  .cred-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px;}
+  .cred-table th,.cred-table td{border:1px solid var(--border);padding:6px 8px;text-align:left;}
+  .cred-table th{background:var(--lightgrey);}
+  .cred-note{background:#FFF7E8;border:1px dashed var(--orange);padding:10px 12px;border-radius:4px;font-size:12px;margin-top:14px;color:#7a5400;}
+  .sec-note{background:#FBEAEA;border:1px dashed #c0392b;padding:8px 10px;border-radius:4px;font-size:11px;margin-top:10px;color:#8a2b20;}
+
+  /* ---------- APP SHELL ---------- */
+  .app-wrap{display:none;min-height:100vh;background:var(--bg-main);}
+  .app-topbar{background:var(--black);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;flex-wrap:wrap;gap:8px;}
+  .app-topbar .who{font-size:13px;color:#ccc;}
+  .app-topbar .who b{color:#fff;}
+  .app-topbar-actions{display:flex;gap:8px;align-items:center;}
+  .logout-btn{background:transparent;border:1px solid #555;color:#eee;padding:6px 14px;font-size:12px;border-radius:3px;}
+  .theme-btn{background:transparent;border:1px solid #555;color:#eee;padding:6px 12px;font-size:12px;border-radius:3px;}
+  .app-body{display:flex;min-height:calc(100vh - 50px);flex-wrap:wrap;}
+  .sidebar{width:210px;background:#1c1c1c;color:#ccc;padding:20px 0;flex-shrink:0;}
+  .sidebar .role-tag{color:var(--orange);font-size:11px;text-transform:uppercase;padding:0 20px 14px;letter-spacing:.5px;}
+  .sidebar a{display:block;padding:11px 20px;font-size:13.5px;color:#ccc;cursor:pointer;}
+  .sidebar a.active,.sidebar a:hover{background:#2a2a2a;color:#fff;border-left:3px solid var(--orange);}
+  .main{flex:1;min-width:280px;padding:26px 30px;color:var(--text-main);}
+  .main h2{font-size:20px;margin-bottom:4px;color:var(--text-main);}
+  .main .sub{color:var(--text-sub);font-size:13px;margin-bottom:22px;}
+
+  .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+  @media(max-width:900px){.stat-row{grid-template-columns:repeat(2,1fr);}}
+  .stat{background:var(--bg-panel);border:1px solid var(--border);border-radius:5px;padding:16px;}
+  .stat .num{font-size:24px;font-weight:800;color:var(--text-main);}
+  .stat .label{font-size:12px;color:var(--text-sub);}
+
+  .panel{background:var(--bg-panel);border:1px solid var(--border);border-radius:5px;padding:20px;margin-bottom:20px;}
+  .panel h3{font-size:15px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;color:var(--text-main);}
+
+  .table-wrap{width:100%;overflow-x:auto;}
+  table.data{width:100%;border-collapse:collapse;font-size:13px;min-width:480px;}
+  table.data th{text-align:left;font-size:11.5px;text-transform:uppercase;color:var(--text-sub);border-bottom:2px solid var(--border);padding:8px 6px;white-space:nowrap;}
+  table.data td{padding:7px 6px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text-main);}
+  .pill{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block;white-space:nowrap;}
+  .pill.ok{background:#E4F6E9;color:#1a7a3d;}
+  .pill.warn{background:#FDF0DA;color:#a3670a;}
+  .pill.busy{background:#FCE4E4;color:#b32323;}
+  .pill.off{background:#eee;color:#888;}
+  select.small,input.small{padding:5px 6px;font-size:12px;border:1px solid var(--border);border-radius:3px;background:var(--bg-panel);color:var(--text-main);}
+  .icon-btn{background:none;border:none;font-size:14px;color:#b32323;cursor:pointer;}
+  select.suc-select{padding:8px 10px;border:1px solid var(--border);border-radius:4px;font-size:13px;margin-bottom:18px;}
+
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:12.5px;}
+  .bar-label{width:120px;flex-shrink:0;color:var(--text-sub);}
+  .bar-track{flex:1;background:#eee;border-radius:3px;height:14px;overflow:hidden;}
+  [data-theme="dark"] .bar-track{background:#2a2a2a;}
+  .bar-fill{height:100%;background:var(--orange);}
+  .bar-val{width:40px;text-align:right;font-weight:700;color:var(--text-main);}
+
+  .ramp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
+  .ramp-card{border:1px solid var(--border);border-radius:5px;padding:12px;text-align:center;}
+  .ramp-card .rid{font-weight:800;font-size:14px;margin-bottom:6px;color:var(--text-main);}
+
+  .timer-card{background:var(--bg-panel);border:1px solid var(--border);border-radius:5px;padding:16px;margin-bottom:14px;}
+  .timer-card .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px;}
+  .timer-card .cliente{font-weight:700;font-size:14px;color:var(--text-main);}
+  .timer-card .clock{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--text-main);}
+  [data-theme="dark"] .timer-card .clock.running{color:var(--neon);}
+  .service-pick{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+  .service-pick .sp-opt{border:1px solid var(--border);border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--text-main);}
+  .service-pick .sp-opt.done{background:#E4F6E9;color:#1a7a3d;border-color:#c7e9d3;cursor:default;}
+  .service-pick .sp-opt.active{background:var(--orange);border-color:var(--orange);font-weight:700;color:#111;}
+  .timer-actions{display:flex;gap:8px;margin-top:12px;}
+  .timer-actions button{flex:1;padding:9px;border-radius:4px;border:none;font-size:12.5px;font-weight:700;}
+  .btn-start{background:var(--orange);color:#111;}
+  .btn-stop{background:#111;color:#fff;}
+  .btn-disabled{background:#eee;color:#aaa;}
+
+  .cal-wrap{display:flex;gap:20px;flex-wrap:wrap;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;flex:2;min-width:320px;}
+  .cal-dow{font-size:10.5px;color:var(--text-sub);text-align:center;font-weight:700;}
+  .cal-day{border:1px solid var(--border);border-radius:4px;min-height:56px;padding:5px;font-size:11.5px;cursor:pointer;position:relative;color:var(--text-main);}
+  .cal-day.empty{border:none;cursor:default;}
+  .cal-day.selected{border-color:var(--orange);background:#FFF7E8;}
+  [data-theme="dark"] .cal-day.selected{background:#2a2410;}
+  .cal-day .dnum{font-weight:700;}
+  .cal-day .dcount{position:absolute;bottom:5px;right:5px;background:var(--orange);color:#111;font-size:10px;font-weight:800;border-radius:10px;padding:1px 6px;}
+  .day-panel{flex:1;min-width:260px;}
+
+  .inline-form{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;align-items:end;}
+  .inline-form label{font-size:11px;font-weight:700;color:var(--text-sub);margin-bottom:3px;display:block;}
+  .inline-form input,.inline-form select{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:3px;font-size:12.5px;background:var(--bg-panel);color:var(--text-main);}
+  .checks{display:flex;flex-wrap:wrap;gap:6px;grid-column:1/-1;}
+  .checks label{display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:400;color:var(--text-main);background:var(--lightgrey);padding:4px 8px;border-radius:12px;}
+  .checks input{width:auto;}
+
+  .locked-note{font-size:11px;color:#aaa;margin-top:10px;}
+  .filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+  .filter-row select,.filter-row input{padding:7px 10px;border:1px solid var(--border);border-radius:4px;font-size:12.5px;background:var(--bg-panel);color:var(--text-main);}
+
+  /* ---------- TOASTS ---------- */
+  #toastHost{position:fixed;bottom:20px;right:20px;z-index:400;display:flex;flex-direction:column;gap:8px;max-width:300px;}
+  .toast{background:#1c1c1c;color:#fff;padding:11px 15px;border-radius:6px;font-size:12.5px;box-shadow:0 6px 16px rgba(0,0,0,.3);border-left:4px solid var(--orange);animation:toastIn .2s ease;}
+  .toast.warn{border-left-color:#e0763a;}
+  .toast.err{border-left-color:#c0392b;}
+  @keyframes toastIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
+/* ============================================================
+   TOCOapp 4.0 — CAPA DE MEJORA VISUAL Y RESPONSIVE
+============================================================ */
+:root{--radius:10px;--shadow:0 4px 14px rgba(0,0,0,.07);--shadow-hover:0 10px 26px rgba(0,0,0,.12);--gold-soft:#c99a2e;}
+body{font-size:14px;line-height:1.45;overflow-x:hidden;}
+.card,.panel,.stat,.brand-card,.timer-card,.ramp-card,.service-opt,.slot{transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease,background-color .22s ease;}
+.card:hover,.panel:hover,.stat:hover,.brand-card:hover{box-shadow:var(--shadow-hover);}
+.btn,.sidebar a,.nav a,.icon-btn,.theme-btn,.logout-btn{transition:all .25s ease;}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.04);box-shadow:0 5px 14px rgba(0,0,0,.12);}
+.panel,.stat,.card,.timer-card,.ramp-card,.brand-card{border-radius:10px;}
+[data-theme="dark"] body{background:#090909;color:var(--text-main);}
+[data-theme="dark"] .app-topbar{background:#050505;border-bottom:1px solid #3a2d08;box-shadow:0 2px 14px rgba(0,0,0,.4);}
+[data-theme="dark"] .sidebar{background:#080808;border-right:1px solid #3a2d08;}
+[data-theme="dark"] .sidebar a.active,[data-theme="dark"] .sidebar a:hover{background:#151515;color:#fff;border-left-color:var(--neon);box-shadow:inset 3px 0 0 var(--neon);}
+[data-theme="dark"] .panel,[data-theme="dark"] .stat,[data-theme="dark"] .card,[data-theme="dark"] .timer-card,[data-theme="dark"] .ramp-card{box-shadow:0 5px 18px rgba(0,0,0,.28);}
+[data-theme="dark"] .timer-card{border-color:#4b3a0d;background:linear-gradient(145deg,#161616,#0e0e0e);}
+[data-theme="dark"] .clock{color:var(--neon)!important;text-shadow:0 0 12px rgba(18,224,224,.25);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:#101010;color:#f5f5f5;border-color:#3a3a3a;}
+[data-theme="dark"] input:focus,[data-theme="dark"] select:focus,[data-theme="dark"] textarea:focus{outline:2px solid rgba(18,224,224,.2);border-color:var(--neon);}
+.data th,.data td{vertical-align:middle;}
+.data tr{transition:background .18s ease;}
+.data tr:hover{background:rgba(247,166,0,.045);}
+.editable-cell{cursor:text;border-radius:6px;}.editable-cell:hover{background:rgba(247,166,0,.09);outline:1px dashed var(--orange);}
+.inline-edit{width:100%;min-width:80px;padding:6px 8px;border:1px solid var(--orange);border-radius:6px;background:var(--bg-panel);color:var(--text-main);font:inherit;}
+.confirm-modal{max-width:460px;}.confirm-icon{font-size:34px;margin-bottom:8px;}.confirm-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;}
+.form-valid{border-color:#20a464!important;box-shadow:0 0 0 2px rgba(32,164,100,.08);}.form-invalid{border-color:#d64545!important;box-shadow:0 0 0 2px rgba(214,69,69,.08);}
+.validation-msg{font-size:11px;margin-top:4px;min-height:15px;}.validation-msg.ok{color:#20a464}.validation-msg.error{color:#d64545}
+.autocomplete-wrap{position:relative;}.autocomplete-list{position:absolute;left:0;right:0;top:100%;z-index:80;background:var(--bg-panel);border:1px solid var(--border);border-radius:0 0 8px 8px;box-shadow:var(--shadow-hover);max-height:180px;overflow:auto;display:none;}.autocomplete-list.show{display:block;}.autocomplete-item{padding:9px 10px;cursor:pointer;font-size:12.5px;border-bottom:1px solid var(--border);}.autocomplete-item:hover{background:var(--lightgrey);}
+.priority-pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 8px;font-size:10px;font-weight:800;}.priority-alta{background:#ffe3e3;color:#a52525}.priority-media{background:#fff0c9;color:#795400}.priority-normal{background:#e6f7ef;color:#147548}
+.timer-service-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:9px;border:1px solid var(--border);border-radius:8px;margin:7px 0;background:var(--bg-panel);}.timer-service-row.active{border-color:var(--neon);box-shadow:0 0 0 1px rgba(18,224,224,.18);}.service-timing{font-size:11px;color:var(--text-sub);text-align:right;white-space:nowrap;}.dead-time{color:#d98c00;font-weight:700;}.timer-control{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;}.btn-neon{background:var(--neon);color:#061010;font-weight:900;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px;}.metric-card{background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;padding:15px;box-shadow:var(--shadow);}.metric-card .metric-value{font-size:24px;font-weight:900;color:var(--text-main);}.metric-card .metric-label{font-size:11px;color:var(--text-sub);margin-top:3px;}
+.drag-appointment{cursor:grab;}.drag-appointment:active{cursor:grabbing;}
+@media(max-width:900px){.main{padding:20px 16px}.stats-grid{grid-template-columns:repeat(2,1fr)}.header-info{gap:12px}.nav ul{gap:14px;padding:0 16px}}
+@media(max-width:700px){
+ .topbar{padding:7px 12px;font-size:11px}.topbar>div:first-child{display:none}.topbar-right{margin-left:auto}.header{padding:12px 14px}.logo,.logo span{font-size:19px}.header-info{width:100%;display:grid;grid-template-columns:1fr;gap:7px;font-size:11px}.header-info>div:nth-child(3){display:none}
+ .nav ul{padding:0 12px;gap:0;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}.nav li{flex:0 0 auto}.nav a{font-size:12px;padding:11px 8px;white-space:nowrap}.nav .nav-right{margin-left:0;gap:0}
+ .hero{padding:42px 18px;min-height:360px;background:linear-gradient(180deg,var(--orange) 0%,var(--orange) 62%,#1a1a1a 62%,#1a1a1a 100%)}.hero-content{max-width:none}.hero h1{font-size:28px}.hero p{font-size:13px}.section{padding:30px 16px}.grid3,.grid4{grid-template-columns:1fr}.row2{grid-template-columns:1fr}.slot-grid{grid-template-columns:repeat(3,1fr)}
+ .app-topbar{padding:10px 12px}.app-topbar .who{font-size:11px}.app-body{display:block}.sidebar{width:100%;padding:7px 8px;display:flex;gap:4px;overflow-x:auto;border-right:0;border-bottom:1px solid #333}.sidebar .role-tag{display:none}.sidebar a{padding:9px 11px;font-size:11.5px;white-space:nowrap;border-left:0!important;border-bottom:3px solid transparent}.sidebar a.active,.sidebar a:hover{border-bottom-color:var(--orange);background:#262626}
+ .main{min-width:0;width:100%;padding:18px 12px}.main h2{font-size:18px}.main .sub{font-size:12px;margin-bottom:16px}.panel{padding:14px;margin-bottom:14px}.stat-row,.stats-grid{grid-template-columns:1fr 1fr;gap:9px}.stat,.metric-card{padding:12px}.stat .num,.metric-card .metric-value{font-size:20px}.table-wrap{margin-left:0;width:100%;border-radius:8px}.data{font-size:11.5px!important}.data th,.data td{padding:7px 8px;white-space:nowrap}
+ .inline-form{display:grid!important;grid-template-columns:1fr!important}.timer-service-row{grid-template-columns:1fr}.service-timing{text-align:left}.timer-control .btn{flex:1;min-width:110px}.clock{font-size:30px!important}.timer-card{padding:14px!important}.modal{border-radius:10px}.overlay{padding:12px 8px}.modal-body{padding:15px;max-height:78vh}.modal-footer{padding:11px 15px}.modal-footer .btn{flex:1}.wa-btn{left:auto;right:14px;bottom:14px;width:48px;height:48px}.confirm-actions{flex-direction:column-reverse}.confirm-actions .btn{width:100%}
+}
+@media(max-width:380px){.slot-grid{grid-template-columns:repeat(2,1fr)}.stats-grid,.stat-row{grid-template-columns:1fr}.app-topbar-actions{gap:4px}.theme-btn,.logout-btn{padding:5px 8px}}
+
+</style>
+</head>
+<body>
+
+<div id="toastHost"></div>
+
+<!-- =====================================================
+     PUBLIC SITE
+====================================================== -->
+<div id="publicSite">
+  <div class="topbar">
+    <div>📍 Muñoz 790, Col. Los Reyes, San Luis Potosí, México</div>
+    <div class="topbar-right">
+      <span class="icon">ig</span><span class="icon">f</span><span class="icon">in</span>
+      <button class="cotiza-btn" onclick="openBooking()">Cotiza tu llanta</button>
+    </div>
+  </div>
+  <div class="header">
+    <div class="logo">GRUPO<span>TOCOLLANTA</span></div>
+    <div class="header-info">
+      <div><div class="badge">📞</div><div><b>Teléfono:</b>4448139893, 4441609234</div></div>
+      <div><div class="badge">🕒</div><div><b>Horario:</b>Lun a Vie 08:00–19:00 y Sáb 8:00–14:00</div></div>
+      <div><div class="badge">🏢</div><div><b>Empresas y flotillas:</b>Cel: 4448279995</div></div>
+    </div>
+  </div>
+  <div class="nav">
+    <ul>
+      <li><a id="navInicio" onclick="showPublicView('inicio')">Inicio</a></li>
+      <li><a id="navSucursales" onclick="showPublicView('sucursales')">Sucursales</a></li>
+      <li><a id="navMarcas" onclick="showPublicView('marcas')">Nuestras marcas</a></li>
+      <li><a id="navPromos" onclick="showPublicView('promos')">Promociones y noticias</a></li>
+      <li><a id="navContacto" onclick="showPublicView('contacto')">Contáctanos</a></li>
+      <li class="nav-right">
+        <a onclick="openBooking()">Agendar cita</a>
+        <a onclick="openClientPortal()">Portal de clientes</a>
+        <a onclick="openLogin()">Acceso personal</a>
+      </li>
+    </ul>
+  </div>
+
+  <div id="publicContent"></div>
+
+  <div style="background:#111;color:#aaa;text-align:center;padding:20px;font-size:12px;">© Grupo Tocollanta — Prototipo TOCOapp · Proyecto Ideación y Prototipado · Equipo 3</div>
+  <div class="wa-btn">💬</div>
+</div>
+
+<!-- =====================================================
+     BOOKING MODAL
+====================================================== -->
+<div class="overlay hidden" id="bookingOverlay">
+  <div class="modal">
+    <div class="modal-head"><h3 id="bookingTitle">Agendar cita — Paso 1 de 4</h3><button class="modal-close" onclick="closeBooking()">✕</button></div>
+    <div class="modal-body">
+      <div class="steps">
+        <div class="step-dot done" id="dot1"></div><div class="step-dot" id="dot2"></div>
+        <div class="step-dot" id="dot3"></div><div class="step-dot" id="dot4"></div>
+      </div>
+      <div id="bstep1">
+        <label style="margin-top:0;">¿Qué necesita tu auto?</label>
+        <div id="serviceList"></div>
+        <p class="helper">Tiempos estimados con base en los promedios registrados en TOCOtimer.</p>
+      </div>
+      <div id="bstep2" class="hidden">
+        <label>Elige sucursal</label>
+        <select id="sucSelect" onchange="renderSlots()"></select>
+        <div id="sucInfo" class="helper"></div>
+        <div id="llantaPickBox" class="hidden">
+          <label>¿Qué llanta necesitas? (para reservar del inventario de esa sucursal)</label>
+          <select id="llantaSelect"></select>
+        </div>
+        <label>Fecha</label>
+        <input type="date" id="fechaInput" onchange="renderSlots()">
+        <label>Horario disponible</label>
+        <div class="slot-grid" id="slotGrid"></div>
+      </div>
+      <div id="bstep3" class="hidden">
+        <div class="row2">
+          <div><label>Nombre completo</label><input type="text" id="cName" placeholder="Ej. Ana López"></div>
+          <div><label>Teléfono / WhatsApp</label><input type="text" id="cPhone" placeholder="444 000 0000"></div>
+        </div>
+        <div id="guestAccountBox">
+          <label style="display:flex;align-items:center;gap:8px;margin-top:16px;">
+            <input type="checkbox" id="wantsAccount" style="width:auto;" onchange="toggleAccount()"> Crear una cuenta para dar seguimiento a mis servicios
+          </label>
+          <div id="accountFields" class="hidden">
+            <label>Correo</label><input type="email" id="cEmail" placeholder="tucorreo@ejemplo.com">
+            <label>Contraseña</label><input type="password" id="cPass" placeholder="Crea una contraseña">
+          </div>
+        </div>
+        <p class="helper" id="guestHelper">Si no creas cuenta, puedes continuar como invitado y solo recibirás avisos por WhatsApp.</p>
+      </div>
+      <div id="bstep4" class="hidden"><div class="summary-box" id="summaryBox"></div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" id="backBtn" onclick="bookingBack()">Atrás</button>
+      <button class="btn btn-orange" id="nextBtn" onclick="bookingNext()">Siguiente</button>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     LOGIN MODAL (personal)
+====================================================== -->
+<div class="overlay hidden" id="loginOverlay">
+  <div class="modal">
+    <div class="modal-head"><h3>Acceso de personal — TOCOapp</h3><button class="modal-close" onclick="closeLogin()">✕</button></div>
+    <div class="modal-body">
+      <label style="margin-top:0;">Usuario</label><input type="text" id="loginUser" placeholder="usuario">
+      <label>Contraseña</label><input type="password" id="loginPass" placeholder="contraseña">
+      <div id="loginError" class="hidden" style="color:#b32323;font-size:12.5px;margin-top:8px;">Usuario o contraseña incorrectos.</div>
+      <div class="cred-note"><b>Prototipo de prueba.</b> Usa cualquiera de estos accesos:</div>
+      <table class="cred-table">
+        <tr><th>Rol</th><th>Usuario</th><th>Contraseña</th></tr>
+        <tr><td>CEO</td><td>ceo.torres</td><td>Ceo2026!</td></tr>
+        <tr><td>Gerente — Matriz</td><td>gerente.matriz</td><td>Matriz2026</td></tr>
+        <tr><td>Gerente — Nava</td><td>gerente.nava</td><td>Nava2026</td></tr>
+        <tr><td>Facturista — Matriz</td><td>factura.matriz</td><td>Fact2026</td></tr>
+        <tr><td>Mecánico — Matriz</td><td>mecanico.juan</td><td>Meca2026</td></tr>
+        <tr><td>Pasante — Matriz</td><td>pasante.ana</td><td>Pasante2026</td></tr>
+      </table>
+      <div class="sec-note">Nota técnica: en este prototipo las contraseñas están visibles a propósito, solo para que puedan probar los accesos. En una versión real esto se maneja con autenticación y contraseñas cifradas en un servidor, nunca en el código del front-end.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline-light btn-sm" onclick="resetDemoData()">Restablecer datos de prueba</button>
+      <button class="btn btn-orange" onclick="doStaffLogin()">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     CLIENT PORTAL MODAL
+====================================================== -->
+<div class="overlay hidden" id="clientOverlay">
+  <div class="modal">
+    <div class="modal-head"><h3>Portal de clientes</h3><button class="modal-close" onclick="closeClientPortal()">✕</button></div>
+    <div class="modal-body">
+      <div class="tabs">
+        <div class="tab active" id="tabLogin" onclick="switchClientTab('login')">Iniciar sesión</div>
+        <div class="tab" id="tabSignup" onclick="switchClientTab('signup')">Crear cuenta</div>
+      </div>
+      <div id="clientLoginForm">
+        <label style="margin-top:14px;">Correo</label><input type="email" id="clLoginEmail" placeholder="tucorreo@ejemplo.com">
+        <label>Contraseña</label><input type="password" id="clLoginPass" placeholder="contraseña">
+        <div id="clLoginError" class="hidden" style="color:#b32323;font-size:12.5px;margin-top:8px;">Correo o contraseña incorrectos.</div>
+        <div class="cred-note">Cuenta de prueba: <b>ana@ejemplo.com</b> / <b>Cliente2026</b></div>
+      </div>
+      <div id="clientSignupForm" class="hidden">
+        <label style="margin-top:14px;">Nombre completo</label><input type="text" id="clSignName" placeholder="Ej. Ana López">
+        <label>Teléfono</label><input type="text" id="clSignPhone" placeholder="444 000 0000">
+        <label>Correo</label><input type="email" id="clSignEmail" placeholder="tucorreo@ejemplo.com">
+        <label>Contraseña</label><input type="password" id="clSignPass" placeholder="Crea una contraseña">
+      </div>
+    </div>
+    <div class="modal-footer"><span></span><button class="btn btn-orange" id="clientPortalBtn" onclick="doClientLogin()">Entrar</button></div>
+  </div>
+</div>
+
+<!-- =====================================================
+     APP SHELL
+====================================================== -->
+<div class="app-wrap" id="appWrap">
+  <div class="app-topbar">
+    <div class="logo" style="font-size:16px;">TOCO<span style="color:var(--orange);">app</span></div>
+    <div class="who">Sesión: <b id="whoName"></b> · <span id="whoRole"></span></div>
+    <div class="app-topbar-actions">
+      <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙 Modo oscuro</button>
+      <button class="logout-btn" onclick="logout()">Cerrar sesión</button>
+    </div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="main" id="mainPanel"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   TOASTS (reemplaza alert())
+============================================================ */
+function toast(msg, type){
+  const host = document.getElementById('toastHost');
+  const el = document.createElement('div');
+  el.className = 'toast' + (type ? ' '+type : '');
+  el.textContent = msg;
+  host.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, 3200);
+}
+
+/* ============================================================
+   TEMA CLARO / OSCURO
+============================================================ */
+function toggleTheme(){
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? '' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '🌙 Modo oscuro' : '☀️ Modo claro';
+  localStorage.setItem('tocoapp_theme', isDark ? '' : 'dark');
+}
+
+/* ============================================================
+   ESTADO GLOBAL
+============================================================ */
+const STORAGE_KEY = 'tocoapp_demo_state_v3';
+let nextId = 5000;
+const newId = () => nextId++;
+
+const servicios = [
+  {id:'bal', nombre:'Balanceo', min:25},
+  {id:'ali', nombre:'Alineación', min:30},
+  {id:'lla', nombre:'Cambio de llanta (juego)', min:40},
+  {id:'fre', nombre:'Revisión de frenos', min:35},
+  {id:'afi', nombre:'Afinación', min:50},
+  {id:'sus', nombre:'Suspensión / amortiguadores', min:45},
+];
+const servicioNombre = id => servicios.find(s=>s.id===id)?.nombre || id;
+
+function makeRamps(n){ return Array.from({length:n}, (_,i)=>({id:i+1, estado:'libre'})); }
+
+function defaultSucursales(){
+  return {
+    matriz: {
+      nombre:'Sucursal Matriz', direccion:'Muñoz 790, Col. Los Reyes',
+      rampas: makeRamps(7),
+      mecanicos:[
+        {id:newId(), nombre:'Juan Pérez', rol:'Mecánico', estado:'Disponible'},
+        {id:newId(), nombre:'Carlos Reyes', rol:'Mecánico', estado:'En servicio'},
+        {id:newId(), nombre:'Miguel Soto', rol:'Mecánico', estado:'En servicio'},
+        {id:newId(), nombre:'Ana Ramírez', rol:'Pasante', estado:'Disponible'},
+      ],
+      inventario:[
+        {id:newId(), marca:'Continental', medida:'195/65 R15', stock:14},
+        {id:newId(), marca:'Bridgestone', medida:'205/55 R16', stock:6},
+        {id:newId(), marca:'Firestone', medida:'175/70 R13', stock:22},
+        {id:newId(), marca:'General Tire', medida:'225/45 R17', stock:3},
+      ],
+    },
+    nava: {
+      nombre:'Sucursal Nava', direccion:'Av. Nava, SLP',
+      rampas: makeRamps(5),
+      mecanicos:[
+        {id:newId(), nombre:'Luis Domínguez', rol:'Mecánico', estado:'Disponible'},
+        {id:newId(), nombre:'Pedro Salas', rol:'Mecánico', estado:'En servicio'},
+        {id:newId(), nombre:'Sofía Herrera', rol:'Pasante', estado:'Disponible'},
+      ],
+      inventario:[
+        {id:newId(), marca:'Continental', medida:'195/65 R15', stock:9},
+        {id:newId(), marca:'Euzkadi', medida:'185/65 R14', stock:11},
+        {id:newId(), marca:'Tornel', medida:'175/70 R13', stock:5},
+      ],
+    },
+    zapata: {
+      nombre:'Sucursal Zapata', direccion:'Blvd. Zapata, SLP',
+      rampas: makeRamps(4),
+      mecanicos:[
+        {id:newId(), nombre:'Diego Franco', rol:'Mecánico', estado:'En servicio'},
+        {id:newId(), nombre:'Rosa Elena Vega', rol:'Mecánico', estado:'Disponible'},
+      ],
+      inventario:[
+        {id:newId(), marca:'Bridgestone', medida:'205/55 R16', stock:8},
+        {id:newId(), marca:'General Tire', medida:'225/45 R17', stock:2},
+      ],
+    }
+  };
+}
+function todayStr(){ return new Date().toISOString().split('T')[0]; }
+function pad(n){return n<10?'0'+n:n;}
+
+function defaultCitas(){
+  return [
+    {id:newId(), sucursal:'matriz', fecha:todayStr(), hora:'09:00', cliente:'Ana López', telefono:'4441112222', servicios:['bal','ali'], estado:'Confirmada', mecanico:null, clienteEmail:'ana@ejemplo.com', progreso:[], llantaId:null},
+    {id:newId(), sucursal:'matriz', fecha:todayStr(), hora:'10:30', cliente:'Roberto Sánchez', telefono:'4443334444', servicios:['lla'], estado:'Confirmada', mecanico:null, clienteEmail:null, progreso:[], llantaId:null},
+    {id:newId(), sucursal:'matriz', fecha:todayStr(), hora:'11:30', cliente:'Karla Jiménez', telefono:'4445556666', servicios:['fre'], estado:'Sin confirmar', mecanico:null, clienteEmail:null, progreso:[], llantaId:null},
+    {id:newId(), sucursal:'nava', fecha:todayStr(), hora:'12:00', cliente:'Diego Martínez', telefono:'4447778888', servicios:['afi'], estado:'Confirmada', mecanico:null, clienteEmail:null, progreso:[], llantaId:null},
+  ];
+}
+function defaultUsuariosStaff(){
+  return {
+    'ceo.torres':      {pass:'Ceo2026!',    rol:'ceo',       nombre:'Sr. Torres (CEO)', sucursal:null},
+    'gerente.matriz':  {pass:'Matriz2026',  rol:'gerente',   nombre:'Gerente — Matriz', sucursal:'matriz'},
+    'gerente.nava':    {pass:'Nava2026',    rol:'gerente',   nombre:'Gerente — Nava',   sucursal:'nava'},
+    'factura.matriz':  {pass:'Fact2026',    rol:'facturista',nombre:'Facturista — Matriz', sucursal:'matriz'},
+    'mecanico.juan':   {pass:'Meca2026',    rol:'mecanico',  nombre:'Juan Pérez', sucursal:'matriz'},
+    'pasante.ana':     {pass:'Pasante2026', rol:'pasante',   nombre:'Ana Ramírez', sucursal:'matriz'},
+  };
+}
+function defaultClientes(){
+  return { 'ana@ejemplo.com': {password:'Cliente2026', nombre:'Ana López', telefono:'4441112222',
+    vehiculos:[{id:newId(), modelo:'Nissan Versa 2020', llanta:'195/65 R15'}]} };
+}
+
+let sucursales = defaultSucursales();
+let citas = defaultCitas();
+let usuariosStaff = defaultUsuariosStaff();
+let clientes = defaultClientes();
+
+let currentUser = null;
+let currentView = 'resumen';
+let publicView = 'inicio';
+let calSelectedDate = todayStr();
+let calMonthOffset = 0;
+let mecTimer = null;
+let invFilterSuc = 'todas';
+let invFilterQuery = '';
+
+/* ============================================================
+   PERSISTENCIA (localStorage)
+============================================================ */
+function saveState(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({sucursales, citas, usuariosStaff, clientes, nextId}));
+  }catch(e){ /* almacenamiento no disponible, seguimos solo en memoria */ }
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const d = JSON.parse(raw);
+      sucursales = d.sucursales || sucursales;
+      citas = d.citas || citas;
+      usuariosStaff = d.usuariosStaff || usuariosStaff;
+      clientes = d.clientes || clientes;
+      nextId = d.nextId || nextId;
+    }
+    const theme = localStorage.getItem('tocoapp_theme');
+    if(theme){ document.documentElement.setAttribute('data-theme','dark'); }
+  }catch(e){ /* sin soporte de localStorage (ej. modo incógnito estricto) */ }
+}
+function resetDemoData(){
+  if(!confirm('Esto borra todos los cambios de prueba (citas, personal, inventario) y regresa a los datos originales. ¿Continuar?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  nextId = 5000;
+  sucursales = defaultSucursales();
+  citas = defaultCitas();
+  usuariosStaff = defaultUsuariosStaff();
+  clientes = defaultClientes();
+  saveState();
+  toast('Datos de prueba restablecidos.');
+  if(currentUser){ renderMain(currentView); } else { closeLogin(); }
+}
+
+/* ============================================================
+   NAV PÚBLICO — Inicio / Sucursales / Marcas / Promos / Contacto
+============================================================ */
+function showPublicView(view){
+  publicView = view;
+  ['navInicio','navSucursales','navMarcas','navPromos','navContacto'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  const map = {inicio:'navInicio', sucursales:'navSucursales', marcas:'navMarcas', promos:'navPromos', contacto:'navContacto'};
+  document.getElementById(map[view]).classList.add('active');
+  renderPublicContent();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function renderPublicContent(){
+  const el = document.getElementById('publicContent');
+  if(publicView==='inicio'){
+    el.innerHTML = `
+      <div class="hero">
+        <div class="hero-content">
+          <h1>Grupo Tocollanta</h1>
+          <p>Nos esforzamos por proporcionarle el mejor servicio a usted y su familia, con la garantía de seguridad que solo nosotros le podemos otorgar. Ahora también en línea: cotiza, agenda y da seguimiento a tu servicio desde TOCOapp.</p>
+          <div class="hero-buttons">
+            <button class="btn btn-dark" onclick="openClientPortal()">Crear mi cuenta</button>
+            <button class="btn btn-orange" onclick="openBooking()">Agenda tu cita</button>
+          </div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">Promociones y Noticias</div><div class="rule"></div>
+        <div class="grid3">
+          <div class="card"><h4>Kit de balanceo + alineación</h4><p>Aprovecha el paquete de servicio rápido en cualquiera de nuestras sucursales.</p></div>
+          <div class="card"><h4>Nuevo: agenda tu cita en línea</h4><p>Cotiza, elige sucursal y horario, y llega directo a dejar tu auto, sin esperas.</p></div>
+          <div class="card"><h4>Nitrógeno para tus llantas</h4><p>Mayor duración y presión estable durante más tiempo.</p></div>
+        </div>
+      </div>
+      <div class="section" style="background:var(--lightgrey);border-radius:8px;">
+        <div class="section-title">TOCOapp</div>
+        <div class="section-sub">Un solo lugar para clientes y para el equipo de cada sucursal</div>
+        <div class="grid3">
+          <div class="card"><h4>Para clientes</h4><p>Crea tu cuenta, guarda tus vehículos, cotiza, agenda en la sucursal que quieras y da seguimiento a tus citas.</p></div>
+          <div class="card"><h4>Para mecánicos</h4><p>Elige qué servicio vas a empezar, corre el cronómetro y pasa al siguiente sin perder tiempo.</p></div>
+          <div class="card"><h4>Para gerentes y CEO</h4><p>Edita personal, inventario, estatus de rampas y calendario de citas en tiempo real.</p></div>
+        </div>
+      </div>`;
+  }
+  else if(publicView==='sucursales'){
+    el.innerHTML = `<div class="section">
+      <div class="section-title">Nuestras sucursales</div><div class="rule"></div>
+      <div class="grid3">
+        ${Object.values(sucursales).map(s=>`
+          <div class="card"><h4>${s.nombre}</h4><p>${s.direccion}<br>${s.rampas.length} rampas de servicio<br>Lun–Vie 08:00–19:00, Sáb 8:00–14:00</p>
+          <button class="btn btn-orange btn-sm" style="margin-top:12px;" onclick="openBooking()">Agendar aquí</button></div>`).join('')}
+      </div></div>`;
+  }
+  else if(publicView==='marcas'){
+    const marcas = ['Continental','Bridgestone','Firestone','Euzkadi','General Tire','Tornel','JK Tire'];
+    el.innerHTML = `<div class="section">
+      <div class="section-title">Nuestras marcas</div><div class="rule"></div>
+      <div class="grid4">${marcas.map(m=>`<div class="brand-card">${m}</div>`).join('')}</div>
+    </div>`;
+  }
+  else if(publicView==='promos'){
+    el.innerHTML = `<div class="section">
+      <div class="section-title">Promociones y Noticias</div><div class="rule"></div>
+      <div class="grid3">
+        <div class="card"><h4>Kit de balanceo + alineación</h4><p>Paquete de servicio rápido en cualquiera de nuestras sucursales.</p></div>
+        <div class="card"><h4>Agenda tu cita en línea</h4><p>Cotiza, elige sucursal y horario, llega directo a dejar tu auto.</p></div>
+        <div class="card"><h4>Nitrógeno para tus llantas</h4><p>Mayor duración y presión estable durante más tiempo.</p></div>
+        <div class="card"><h4>Revisión gratuita de frenos</h4><p>En la compra de cualquier juego de llantas durante este mes.</p></div>
+      </div></div>`;
+  }
+  else if(publicView==='contacto'){
+    el.innerHTML = `<div class="section">
+      <div class="section-title">Contáctanos</div><div class="rule"></div>
+      <div class="grid3">
+        <div class="card"><h4>Teléfono</h4><p>4448139893<br>4441609234</p></div>
+        <div class="card"><h4>Empresas y flotillas</h4><p>Cel: 4448279995</p></div>
+        <div class="card"><h4>Dirección (Matriz)</h4><p>Muñoz 790, Col. Los Reyes, San Luis Potosí</p></div>
+      </div>
+      <div class="card" style="max-width:500px;margin:26px auto 0;">
+        <h4>Escríbenos</h4>
+        <label style="font-size:12px;font-weight:700;color:var(--grey);display:block;margin:10px 0 4px;">Nombre</label>
+        <input type="text" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:4px;">
+        <label style="font-size:12px;font-weight:700;color:var(--grey);display:block;margin:10px 0 4px;">Mensaje</label>
+        <textarea style="width:100%;padding:8px;border:1px solid var(--border);border-radius:4px;" rows="3"></textarea>
+        <button class="btn btn-orange btn-sm" style="margin-top:12px;" onclick="toast('Mensaje enviado (demo).')">Enviar</button>
+      </div></div>`;
+  }
+}
+
+/* ============================================================
+   BOOKING FLOW
+============================================================ */
+let bStep = 1, selectedServices = [], selectedSlot = null;
+
+function openBooking(){
+  document.getElementById('bookingOverlay').classList.remove('hidden');
+  bStep = 1; selectedServices = []; selectedSlot = null;
+  renderServiceList(); populateSucursalSelect();
+  document.getElementById('fechaInput').value = todayStr();
+  document.getElementById('fechaInput').min = todayStr();
+  const guestBox = document.getElementById('guestAccountBox');
+  const helper = document.getElementById('guestHelper');
+  if(currentUser && currentUser.tipo==='cliente'){
+    guestBox.classList.add('hidden');
+    helper.textContent = 'Se agendará directamente en tu cuenta: ' + currentUser.nombre + '.';
+    document.getElementById('cName').value = currentUser.nombre;
+    document.getElementById('cPhone').value = currentUser.telefono;
+  } else {
+    guestBox.classList.remove('hidden');
+    helper.textContent = 'Si no creas cuenta, puedes continuar como invitado y solo recibirás avisos por WhatsApp.';
+  }
+  showStep();
+}
+function closeBooking(){ document.getElementById('bookingOverlay').classList.add('hidden'); }
+function renderServiceList(){
+  const el = document.getElementById('serviceList'); el.innerHTML = '';
+  servicios.forEach(s=>{
+    const div = document.createElement('div');
+    div.className = 'service-opt' + (selectedServices.includes(s.id) ? ' selected' : '');
+    div.innerHTML = `<span>${s.nombre}</span><span class="time">~${s.min} min</span>`;
+    div.onclick = () => toggleService(s.id);
+    el.appendChild(div);
+  });
+}
+function toggleService(id){
+  selectedServices = selectedServices.includes(id) ? selectedServices.filter(x=>x!==id) : [...selectedServices, id];
+  renderServiceList();
+}
+function populateSucursalSelect(){
+  const sel = document.getElementById('sucSelect'); sel.innerHTML = '';
+  Object.keys(sucursales).forEach(key=>{
+    const opt = document.createElement('option'); opt.value = key; opt.textContent = sucursales[key].nombre;
+    sel.appendChild(opt);
+  });
+  renderSlots();
+}
+function renderSlots(){
+  const key = document.getElementById('sucSelect').value;
+  const suc = sucursales[key];
+  const fecha = document.getElementById('fechaInput').value;
+  const ocupadas = citas.filter(c=>c.sucursal===key && c.fecha===fecha).map(c=>c.hora);
+  document.getElementById('sucInfo').textContent = `${suc.direccion} · ${suc.rampas.length} rampas · ${ocupadas.length} citas ese día`;
+
+  const llantaBox = document.getElementById('llantaPickBox');
+  const llantaSel = document.getElementById('llantaSelect');
+  if(selectedServices.includes('lla')){
+    llantaBox.classList.remove('hidden');
+    llantaSel.innerHTML = suc.inventario.map(i=>`<option value="${i.id}">${i.marca} ${i.medida} (${i.stock} disp.)</option>`).join('') || '<option>Sin inventario registrado</option>';
+  } else { llantaBox.classList.add('hidden'); }
+
+  const grid = document.getElementById('slotGrid'); grid.innerHTML = '';
+  const horas = ['09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30'];
+  horas.forEach(h=>{
+    const busy = ocupadas.includes(h);
+    const div = document.createElement('div');
+    div.className = 'slot' + (busy?' busy':'') + (selectedSlot===h?' selected':'');
+    div.textContent = h;
+    if(!busy) div.onclick = () => { selectedSlot = h; renderSlots(); };
+    grid.appendChild(div);
+  });
+}
+function toggleAccount(){ document.getElementById('accountFields').classList.toggle('hidden', !document.getElementById('wantsAccount').checked); }
+function estimatedTime(){ return selectedServices.reduce((acc,id)=> acc + servicios.find(s=>s.id===id).min, 0); }
+
+function showStep(){
+  for(let i=1;i<=4;i++){
+    document.getElementById('bstep'+i).classList.toggle('hidden', i!==bStep);
+    document.getElementById('dot'+i).classList.toggle('done', i<=bStep);
+  }
+  document.getElementById('bookingTitle').textContent = `Agendar cita — Paso ${bStep} de 4`;
+  document.getElementById('backBtn').style.visibility = bStep===1 ? 'hidden' : 'visible';
+  document.getElementById('nextBtn').textContent = bStep===4 ? 'Confirmar cita' : 'Siguiente';
+  if(bStep===4){
+    const key = document.getElementById('sucSelect').value; const suc = sucursales[key];
+    const nombreServicios = selectedServices.map(servicioNombre).join(', ') || '—';
+    const nombre = document.getElementById('cName').value || '—';
+    const fecha = document.getElementById('fechaInput').value;
+    document.getElementById('summaryBox').innerHTML = `
+      <b>Cliente:</b> ${nombre}<br><b>Servicios:</b> ${nombreServicios}<br>
+      <b>Sucursal:</b> ${suc.nombre} (${suc.direccion})<br>
+      <b>Fecha y hora:</b> ${fecha} — ${selectedSlot || '—'}<br><br>
+      <b>Tiempo estimado del servicio:</b> <span class="est-time">${estimatedTime()} min</span><br>
+      <span style="color:#777;font-size:11.5px;">Recibirás un aviso por WhatsApp cuando tu auto esté listo.</span>`;
+  }
+}
+function bookingNext(){
+  if(bStep===1 && selectedServices.length===0){ toast('Elige al menos un servicio.','warn'); return; }
+  if(bStep===2 && !selectedSlot){ toast('Elige un horario disponible.','warn'); return; }
+  if(bStep===3 && !document.getElementById('cName').value){ toast('Escribe tu nombre para continuar.','warn'); return; }
+  if(bStep===4){ confirmBooking(); return; }
+  bStep++; showStep();
+}
+function bookingBack(){ if(bStep>1){ bStep--; showStep(); } }
+
+function confirmBooking(){
+  const key = document.getElementById('sucSelect').value;
+  const fecha = document.getElementById('fechaInput').value;
+  let clienteEmail = null;
+  if(currentUser && currentUser.tipo==='cliente'){
+    clienteEmail = currentUser.email;
+  } else if(document.getElementById('wantsAccount').checked){
+    const email = document.getElementById('cEmail').value, pass = document.getElementById('cPass').value;
+    if(email && pass){
+      clientes[email] = {password:pass, nombre:document.getElementById('cName').value, telefono:document.getElementById('cPhone').value, vehiculos:[]};
+      clienteEmail = email;
+    }
+  }
+  const llantaId = selectedServices.includes('lla') ? document.getElementById('llantaSelect').value : null;
+  citas.push({
+    id:newId(), sucursal:key, fecha, hora:selectedSlot,
+    cliente:document.getElementById('cName').value, telefono:document.getElementById('cPhone').value,
+    servicios:[...selectedServices], estado:'Confirmada', mecanico:null, clienteEmail, progreso:[],
+    llantaId: llantaId || null
+  });
+  saveState();
+  toast('¡Cita agendada correctamente!');
+  closeBooking();
+  if(currentUser){ renderMain(currentView); }
+}
+
+/* ============================================================
+   LOGIN — PERSONAL
+============================================================ */
+function openLogin(){ document.getElementById('loginOverlay').classList.remove('hidden'); }
+function closeLogin(){ document.getElementById('loginOverlay').classList.add('hidden'); }
+function doStaffLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value.trim();
+  const user = usuariosStaff[u];
+  if(!user || user.pass !== p){ document.getElementById('loginError').classList.remove('hidden'); return; }
+  document.getElementById('loginError').classList.add('hidden');
+  currentUser = {tipo:'staff', username:u, ...user};
+  closeLogin(); enterApp();
+}
+
+/* ============================================================
+   LOGIN / SIGNUP — CLIENTE
+============================================================ */
+function openClientPortal(){ document.getElementById('clientOverlay').classList.remove('hidden'); switchClientTab('login'); }
+function closeClientPortal(){ document.getElementById('clientOverlay').classList.add('hidden'); }
+function switchClientTab(tab){
+  document.getElementById('tabLogin').classList.toggle('active', tab==='login');
+  document.getElementById('tabSignup').classList.toggle('active', tab==='signup');
+  document.getElementById('clientLoginForm').classList.toggle('hidden', tab!=='login');
+  document.getElementById('clientSignupForm').classList.toggle('hidden', tab!=='signup');
+  document.getElementById('clientPortalBtn').textContent = tab==='login' ? 'Entrar' : 'Crear cuenta';
+  document.getElementById('clientPortalBtn').onclick = tab==='login' ? doClientLogin : doClientSignup;
+}
+function doClientLogin(){
+  const email = document.getElementById('clLoginEmail').value.trim();
+  const pass = document.getElementById('clLoginPass').value.trim();
+  const c = clientes[email];
+  if(!c || c.password !== pass){ document.getElementById('clLoginError').classList.remove('hidden'); return; }
+  document.getElementById('clLoginError').classList.add('hidden');
+  currentUser = {tipo:'cliente', email, nombre:c.nombre, telefono:c.telefono};
+  closeClientPortal(); enterApp();
+}
+function doClientSignup(){
+  const nombre = document.getElementById('clSignName').value.trim();
+  const telefono = document.getElementById('clSignPhone').value.trim();
+  const email = document.getElementById('clSignEmail').value.trim();
+  const pass = document.getElementById('clSignPass').value.trim();
+  if(!nombre || !email || !pass){ toast('Completa nombre, correo y contraseña.','warn'); return; }
+  clientes[email] = {password:pass, nombre, telefono, vehiculos:[]};
+  currentUser = {tipo:'cliente', email, nombre, telefono};
+  saveState();
+  closeClientPortal(); enterApp();
+}
+
+/* ============================================================
+   ENTRAR / SALIR
+============================================================ */
+function enterApp(){
+  document.getElementById('publicSite').classList.add('hidden');
+  document.getElementById('appWrap').style.display = 'block';
+  document.getElementById('whoName').textContent = currentUser.nombre;
+  document.getElementById('whoRole').textContent = currentUser.tipo==='cliente' ? 'Cliente' : rolLabel(currentUser.rol);
+  renderSidebar();
+  currentView = currentUser.tipo==='cliente' ? 'mis-citas' : 'resumen';
+  renderMain(currentView);
+}
+function logout(){
+  if(mecTimer) clearInterval(mecTimer.handle);
+  mecTimer = null;
+  currentUser = null;
+  document.getElementById('appWrap').style.display = 'none';
+  document.getElementById('publicSite').classList.remove('hidden');
+  ['loginUser','loginPass','clLoginEmail','clLoginPass'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+}
+function rolLabel(r){ return {ceo:'CEO', gerente:'Gerente de sucursal', facturista:'Facturista', mecanico:'Mecánico', pasante:'Pasante'}[r]; }
+
+/* ============================================================
+   SIDEBAR
+============================================================ */
+function renderSidebar(){
+  const sb = document.getElementById('sidebar');
+  let items = [];
+  if(currentUser.tipo==='cliente'){
+    items = [['mis-citas','Mis citas'],['agendar','Agendar cita'],['vehiculos','Mis vehículos'],['perfil','Mi perfil']];
+  } else if(currentUser.rol==='ceo'){
+    items = [['resumen','Resumen general'],['sucursales','Sucursales'],['personal','Personal'],['inventario','Inventario'],['rampas','Rampas'],['calendario','Calendario de citas']];
+  } else if(currentUser.rol==='gerente'){
+    items = [['resumen','Resumen de mi sucursal'],['personal','Personal'],['inventario','Inventario'],['rampas','Rampas'],['calendario','Calendario de citas']];
+  } else if(currentUser.rol==='facturista'){
+    items = [['cotizar','Cotización'],['calendario','Agenda / calendario'],['pagos','Pagos y factura']];
+  } else {
+    items = [['agenda','Mi agenda de hoy']];
+  }
+  sb.innerHTML = `<div class="role-tag">${currentUser.tipo==='cliente' ? 'Cliente' : rolLabel(currentUser.rol)}</div>` +
+    items.map(([key,label])=>`<a data-key="${key}" onclick="selectNav(this,'${key}')">${label}</a>`).join('');
+  currentView = items[0][0];
+  document.querySelectorAll('.sidebar a').forEach(a=> a.classList.toggle('active', a.dataset.key===currentView));
+}
+function selectNav(el,key){
+  document.querySelectorAll('.sidebar a').forEach(a=>a.classList.remove('active'));
+  el.classList.add('active');
+  currentView = key;
+  renderMain(key);
+}
+
+/* ============================================================
+   HELPERS
+============================================================ */
+function ocupacionSucursal(suc){
+  const total = suc.rampas.length;
+  const ocupadas = suc.rampas.filter(r=>r.estado==='ocupada').length;
+  return total ? Math.round((ocupadas/total)*100) : 0;
+}
+function citasDe(sucKey, fecha){ return citas.filter(c=>c.sucursal===sucKey && (!fecha || c.fecha===fecha)); }
+function twrap(inner){ return `<div class="table-wrap">${inner}</div>`; }
+
+/* ============================================================
+   RENDER PRINCIPAL
+============================================================ */
+function renderMain(view){
+  currentView = view;
+  const main = document.getElementById('mainPanel');
+
+  /* ---------------- CLIENTE ---------------- */
+  if(currentUser.tipo==='cliente'){
+    const c = clientes[currentUser.email];
+    if(view==='mis-citas'){
+      const misCitas = citas.filter(x=>x.clienteEmail===currentUser.email);
+      main.innerHTML = `<h2>Mis citas</h2><div class="sub">Historial y próximas citas</div>
+        <div class="panel">
+          ${misCitas.length===0 ? '<p class="helper">Todavía no tienes citas. Agenda una desde el menú.</p>' : twrap(`
+          <table class="data">
+            <tr><th>Fecha</th><th>Hora</th><th>Sucursal</th><th>Servicios</th><th>Estado</th><th></th></tr>
+            ${misCitas.map(ct=>`
+              <tr>
+                <td>${ct.fecha}</td><td>${ct.hora}</td><td>${sucursales[ct.sucursal].nombre}</td>
+                <td>${ct.servicios.map(servicioNombre).join(', ')}</td>
+                <td><span class="pill ${ct.estado==='Confirmada'||ct.estado==='Completada'?'ok':'warn'}">${ct.estado}</span></td>
+                <td>${ct.estado!=='Completada' ? `<button class="icon-btn" onclick="cancelarCitaCliente(${ct.id})">Cancelar</button>` : ''}</td>
+              </tr>`).join('')}
+          </table>`)}
+        </div>
+        <button class="btn btn-orange" onclick="openBooking()">+ Agendar nueva cita</button>`;
+    }
+    else if(view==='agendar'){ openBooking(); renderMain('mis-citas'); }
+    else if(view==='vehiculos'){
+      main.innerHTML = `<h2>Mis vehículos</h2><div class="sub">Guarda tus autos para cotizar más rápido</div>
+        <div class="panel">
+          ${twrap(`<table class="data">
+            <tr><th>Modelo</th><th>Medida de llanta</th><th></th></tr>
+            ${c.vehiculos.map(v=>`<tr><td>${v.modelo}</td><td>${v.llanta}</td><td><button class="icon-btn" onclick="delVehiculo('${v.id}')">✕ Quitar</button></td></tr>`).join('') || '<tr><td colspan="3" class="helper">Aún no agregas vehículos.</td></tr>'}
+          </table>`)}
+          <div class="inline-form" style="margin-top:16px;">
+            <div><label>Modelo</label><input type="text" id="vModelo" placeholder="Ej. Toyota Corolla 2019"></div>
+            <div><label>Medida de llanta</label><input type="text" id="vLlanta" placeholder="Ej. 195/65 R15"></div>
+            <div class="checks"><button class="btn btn-orange btn-sm" onclick="addVehiculo()">+ Agregar vehículo</button></div>
+          </div>
+        </div>`;
+    }
+    else if(view==='perfil'){
+      main.innerHTML = `<h2>Mi perfil</h2><div class="sub">Datos de tu cuenta</div>
+        <div class="panel">
+          <label>Nombre</label><input type="text" id="pNombre" value="${c.nombre}">
+          <label>Teléfono</label><input type="text" id="pTelefono" value="${c.telefono||''}">
+          <label>Correo</label><input type="text" value="${currentUser.email}" disabled>
+          <button class="btn btn-orange btn-sm" style="margin-top:14px;" onclick="guardarPerfil()">Guardar cambios</button>
+        </div>`;
+    }
+    return;
+  }
+
+  /* ---------------- STAFF: RESUMEN ---------------- */
+  if(view==='resumen'){
+    const scope = currentUser.rol==='ceo' ? sucursales : {[currentUser.sucursal]: sucursales[currentUser.sucursal]};
+    const list = Object.entries(scope);
+    const totalCitas = list.reduce((a,[k,s])=>a+citasDe(k,todayStr()).length,0);
+    const totalMec = list.reduce((a,[k,s])=>a+s.mecanicos.length,0);
+    const ocupPromedio = Math.round(list.reduce((a,[k,s])=>a+ocupacionSucursal(s),0)/list.length);
+    main.innerHTML = `
+      <h2>${currentUser.rol==='ceo' ? 'Resumen general — todas las sucursales' : 'Resumen — ' + scope[currentUser.sucursal].nombre}</h2>
+      <div class="sub">Estadísticas en vivo</div>
+      <div class="stat-row">
+        <div class="stat"><div class="num">${totalCitas}</div><div class="label">Citas hoy</div></div>
+        <div class="stat"><div class="num">${ocupPromedio}%</div><div class="label">Ocupación de rampas</div></div>
+        <div class="stat"><div class="num">${totalMec}</div><div class="label">Personal en piso</div></div>
+        <div class="stat"><div class="num">${list.length}</div><div class="label">${currentUser.rol==='ceo'?'Sucursales activas':'Sucursal'}</div></div>
+      </div>
+      <div class="panel"><h3>Ocupación de rampas por sucursal</h3>
+        ${list.map(([k,s])=>`<div class="bar-row"><div class="bar-label">${s.nombre}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${ocupacionSucursal(s)}%"></div></div>
+          <div class="bar-val">${ocupacionSucursal(s)}%</div></div>`).join('')}
+      </div>
+      <div class="panel"><h3>Citas agendadas hoy por sucursal</h3>
+        ${list.map(([k,s])=>{ const n=citasDe(k,todayStr()).length; const pct=Math.min(100, n*10); return `
+          <div class="bar-row"><div class="bar-label">${s.nombre}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:#111;"></div></div>
+          <div class="bar-val">${n}</div></div>`;}).join('')}
+      </div>
+      <div class="panel"><h3>Detalle de sucursales</h3>
+        ${twrap(`<table class="data"><tr><th>Sucursal</th><th>Rampas</th><th>Personal</th><th>Citas hoy</th><th>Ocupación</th></tr>
+        ${list.map(([k,s])=>`<tr><td>${s.nombre}</td><td>${s.rampas.length}</td><td>${s.mecanicos.length}</td><td>${citasDe(k,todayStr()).length}</td><td>${ocupacionSucursal(s)}%</td></tr>`).join('')}
+        </table>`)}
+      </div>`;
+  }
+
+  else if(view==='sucursales'){
+    main.innerHTML = `<h2>Sucursales</h2><div class="sub">Editables — solo CEO</div>` +
+      Object.entries(sucursales).map(([k,s])=>`
+        <div class="panel">
+          <h3>${s.nombre}</h3>
+          <div class="inline-form">
+            <div><label>Nombre</label><input type="text" id="sn-${k}" value="${s.nombre}"></div>
+            <div><label>Dirección</label><input type="text" id="sd-${k}" value="${s.direccion}"></div>
+            <div class="checks"><button class="btn btn-orange btn-sm" onclick="editarSucursal('${k}')">Guardar cambios</button></div>
+          </div>
+          ${twrap(`<table class="data"><tr><th>Rampas</th><th>Personal</th><th>Citas hoy</th><th>Ocupación</th></tr>
+          <tr><td>${s.rampas.length}</td><td>${s.mecanicos.length}</td><td>${citasDe(k,todayStr()).length}</td><td>${ocupacionSucursal(s)}%</td></tr></table>`)}
+        </div>`).join('') +
+      `<div class="panel"><h3>Agregar nueva sucursal</h3>
+        <div class="inline-form">
+          <div><label>Nombre</label><input type="text" id="newSucNombre" placeholder="Ej. Sucursal Periférico"></div>
+          <div><label>Dirección</label><input type="text" id="newSucDireccion" placeholder="Dirección"></div>
+          <div><label>Número de rampas</label><input type="number" id="newSucRampas" min="1" value="4"></div>
+          <div class="checks"><button class="btn btn-orange btn-sm" onclick="addSucursal()">+ Agregar sucursal</button></div>
+        </div>
+      </div>`;
+  }
+
+  else if(view==='personal'){
+    const scope = currentUser.rol==='ceo' ? sucursales : {[currentUser.sucursal]: sucursales[currentUser.sucursal]};
+    main.innerHTML = `<h2>Personal</h2><div class="sub">Agrega, edita estado o da de baja al personal</div>` +
+      Object.entries(scope).map(([key,s])=>`
+        <div class="panel">
+          <h3>${s.nombre}</h3>
+          ${twrap(`<table class="data"><tr><th>Nombre</th><th>Rol</th><th>Estado</th><th></th></tr>
+            ${s.mecanicos.map(m=>`
+              <tr><td>${m.nombre}</td><td>${m.rol}</td>
+                <td><select class="small" onchange="setEstadoPersonal('${key}',${m.id},this.value)">
+                  ${['Disponible','En servicio','Descanso','Fuera de turno'].map(op=>`<option ${m.estado===op?'selected':''}>${op}</option>`).join('')}
+                </select></td>
+                <td><button class="icon-btn" onclick="delPersonal('${key}',${m.id})">✕</button></td></tr>`).join('')}
+          </table>`)}
+          <div class="inline-form" style="margin-top:14px;">
+            <div><label>Nombre</label><input type="text" id="np-${key}" placeholder="Nombre completo"></div>
+            <div><label>Rol</label><select id="nr-${key}"><option>Mecánico</option><option>Pasante</option><option>Facturista</option><option>Jefe de patio</option></select></div>
+            <div class="checks"><button class="btn btn-orange btn-sm" onclick="addPersonal('${key}')">+ Agregar personal</button></div>
+          </div>
+        </div>`).join('');
+  }
+
+  else if(view==='inventario'){ renderInventarioView(main); }
+
+  else if(view==='rampas'){
+    const scope = currentUser.rol==='ceo' ? sucursales : {[currentUser.sucursal]: sucursales[currentUser.sucursal]};
+    main.innerHTML = `<h2>Estatus de rampas</h2><div class="sub">Cambia el estatus de cada rampa en tiempo real</div>` +
+      Object.entries(scope).map(([key,s])=>`
+        <div class="panel">
+          <h3>${s.nombre} <span style="font-weight:400;color:var(--text-sub);font-size:12px;">— ${ocupacionSucursal(s)}% ocupación</span>
+          <button class="btn btn-outline-light btn-sm" onclick="addRampa('${key}')">+ Agregar rampa</button></h3>
+          <div class="ramp-grid">
+            ${s.rampas.map(r=>`
+              <div class="ramp-card"><div class="rid">Rampa ${r.id}</div>
+                <select class="small" style="width:100%;" onchange="setRampa('${key}',${r.id},this.value)">
+                  <option value="libre" ${r.estado==='libre'?'selected':''}>Libre</option>
+                  <option value="ocupada" ${r.estado==='ocupada'?'selected':''}>Ocupada</option>
+                  <option value="mantenimiento" ${r.estado==='mantenimiento'?'selected':''}>Mantenimiento</option>
+                </select></div>`).join('')}
+          </div>
+        </div>`).join('');
+  }
+
+  else if(view==='calendario'){ renderCalendarView(main); }
+
+  else if(view==='cotizar'){
+    main.innerHTML = `<h2>Cotización rápida</h2><div class="sub">${sucursales[currentUser.sucursal].nombre}</div>
+      <div class="panel">
+        <label>Nombre del cliente</label><input type="text" id="qCliente" placeholder="Nombre">
+        <label>Modelo del auto</label><input type="text" id="qModelo" placeholder="Ej. Nissan Versa 2020">
+        <label>Servicios</label>
+        <div class="checks">${servicios.map(s=>`<label><input type="checkbox" class="qserv" value="${s.id}"> ${s.nombre}</label>`).join('')}</div>
+        <div id="qResult" class="summary-box hidden"></div>
+        <button class="btn btn-orange" style="margin-top:16px;" onclick="generarCotizacion()">Generar cotización</button>
+      </div>`;
+  }
+  else if(view==='pagos'){
+    const misCitas = citasDe(currentUser.sucursal).filter(c=>c.fecha===todayStr());
+    main.innerHTML = `<h2>Pagos y factura</h2><div class="sub">${sucursales[currentUser.sucursal].nombre} — hoy</div>
+      <div class="panel">${twrap(`<table class="data">
+          <tr><th>Cliente</th><th>Servicios</th><th>Estado de la cita</th><th>Pago</th></tr>
+          ${misCitas.map(c=>`<tr><td>${c.cliente}</td><td>${c.servicios.map(servicioNombre).join(', ')}</td><td><span class="pill ${c.estado==='Completada'?'ok':'warn'}">${c.estado}</span></td>
+          <td><select class="small" onchange="setPago(${c.id},this.value)"><option>Pendiente</option><option>Pagado en línea</option><option>Pagado en sucursal</option></select></td></tr>`).join('') || '<tr><td colspan="4" class="helper">Sin citas hoy.</td></tr>'}
+        </table>`)}
+      </div>`;
+  }
+
+  else if(view==='agenda'){ renderAgendaMecanico(main); }
+}
+
+/* ============================================================
+   INVENTARIO — vista global filtrable
+============================================================ */
+function renderInventarioView(main){
+  const esCeoOGerente = currentUser.rol==='ceo' || currentUser.rol==='gerente';
+  const opciones = `<option value="todas">Todas las sucursales</option>` +
+    Object.entries(sucursales).map(([k,s])=>`<option value="${k}">${s.nombre}</option>`).join('');
+
+  let filas = [];
+  Object.entries(sucursales).forEach(([key,s])=>{
+    if(invFilterSuc!=='todas' && invFilterSuc!==key) return;
+    s.inventario.forEach(i=>{
+      if(invFilterQuery && !(`${i.marca} ${i.medida}`.toLowerCase().includes(invFilterQuery.toLowerCase()))) return;
+      filas.push({key, suc:s, item:i});
+    });
+  });
+
+  const puedeEditar = (key) => currentUser.rol==='ceo' || key===currentUser.sucursal;
+
+  main.innerHTML = `<h2>Inventario de llantas</h2>
+    <div class="sub">${currentUser.rol==='ceo' ? 'Disponibilidad de todas las sucursales' : 'Tu inventario es editable; el de las demás sucursales es solo consulta'}</div>
+    <div class="panel">
+      <div class="filter-row">
+        <select id="invSucFilter" onchange="invFilterSuc=this.value; renderMain('inventario')">${opciones}</select>
+        <input type="text" id="invQuery" placeholder="Buscar marca o medida…" value="${invFilterQuery}" oninput="invFilterQuery=this.value; renderMain('inventario')">
+      </div>
+      ${twrap(`<table class="data">
+        <tr><th>Sucursal</th><th>Marca</th><th>Medida</th><th>Stock</th><th></th></tr>
+        ${filas.map(({key,suc,item})=>{
+          const editable = puedeEditar(key);
+          return `<tr>
+            <td>${suc.nombre}</td><td>${item.marca}</td><td>${item.medida}</td>
+            <td>${editable
+              ? `<input class="small" type="number" min="0" style="width:70px;" value="${item.stock}" onchange="setStock('${key}',${item.id},this.value)">`
+              : `<span class="pill ${item.stock>5?'ok':'warn'}">${item.stock} pzas</span>`}</td>
+            <td>${editable ? `<button class="icon-btn" onclick="delInventario('${key}',${item.id})">✕</button>` : `<span class="helper">Solo lectura</span>`}</td>
+          </tr>`;
+        }).join('') || '<tr><td colspan="5" class="helper">No hay resultados con ese filtro.</td></tr>'}
+      </table>`)}
+    </div>
+    <div class="panel">
+      <h3>Agregar modelo a mi sucursal</h3>
+      ${currentUser.rol==='gerente' || currentUser.rol==='ceo' ? `
+      <div class="inline-form">
+        ${currentUser.rol==='ceo' ? `<div><label>Sucursal</label><select id="im-suc">${Object.entries(sucursales).map(([k,s])=>`<option value="${k}">${s.nombre}</option>`).join('')}</select></div>` : ''}
+        <div><label>Marca</label><input type="text" id="im-marca" placeholder="Ej. Pirelli"></div>
+        <div><label>Medida</label><input type="text" id="im-medida" placeholder="Ej. 205/55 R16"></div>
+        <div><label>Stock inicial</label><input type="number" id="im-stock" placeholder="0" min="0"></div>
+        <div class="checks"><button class="btn btn-orange btn-sm" onclick="addInventarioGlobal()">+ Agregar modelo</button></div>
+      </div>` : ''}
+    </div>`;
+}
+function addInventarioGlobal(){
+  const key = currentUser.rol==='ceo' ? document.getElementById('im-suc').value : currentUser.sucursal;
+  const marca = document.getElementById('im-marca').value.trim();
+  const medida = document.getElementById('im-medida').value.trim();
+  const stock = parseInt(document.getElementById('im-stock').value)||0;
+  if(!marca || !medida){ toast('Completa marca y medida.','warn'); return; }
+  sucursales[key].inventario.push({id:newId(), marca, medida, stock});
+  saveState();
+  toast(`${marca} ${medida} agregado al inventario de ${sucursales[key].nombre}.`);
+  renderMain('inventario');
+}
+
+/* ============================================================
+   ACCIONES: SUCURSALES / PERSONAL / INVENTARIO / RAMPAS
+============================================================ */
+function editarSucursal(key){
+  const nombre = document.getElementById('sn-'+key).value.trim();
+  const direccion = document.getElementById('sd-'+key).value.trim();
+  if(!nombre || !direccion){ toast('Completa nombre y dirección.','warn'); return; }
+  sucursales[key].nombre = nombre; sucursales[key].direccion = direccion;
+  saveState(); toast('Sucursal actualizada.'); renderMain('sucursales');
+}
+function addSucursal(){
+  const nombre = document.getElementById('newSucNombre').value.trim();
+  const direccion = document.getElementById('newSucDireccion').value.trim();
+  const rampas = parseInt(document.getElementById('newSucRampas').value)||4;
+  if(!nombre || !direccion){ toast('Completa nombre y dirección.','warn'); return; }
+  const key = nombre.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || ('suc'+newId());
+  if(sucursales[key]){ toast('Ya existe una sucursal con ese nombre.','warn'); return; }
+  sucursales[key] = {nombre, direccion, rampas:makeRamps(rampas), mecanicos:[], inventario:[]};
+  saveState(); toast('Sucursal agregada.'); renderMain('sucursales');
+}
+function setEstadoPersonal(sucKey,id,val){ const m = sucursales[sucKey].mecanicos.find(x=>x.id===id); m.estado = val; saveState(); renderMain(currentView); }
+function delPersonal(sucKey,id){ sucursales[sucKey].mecanicos = sucursales[sucKey].mecanicos.filter(x=>x.id!==id); saveState(); renderMain(currentView); }
+function addPersonal(sucKey){
+  const nombre = document.getElementById('np-'+sucKey).value.trim();
+  const rol = document.getElementById('nr-'+sucKey).value;
+  if(!nombre){ toast('Escribe el nombre.','warn'); return; }
+  sucursales[sucKey].mecanicos.push({id:newId(), nombre, rol, estado:'Disponible'});
+  saveState(); toast('Personal agregado.'); renderMain(currentView);
+}
+function setStock(sucKey,id,val){ const i = sucursales[sucKey].inventario.find(x=>x.id===id); i.stock = parseInt(val)||0; saveState(); renderMain(currentView); }
+function delInventario(sucKey,id){ sucursales[sucKey].inventario = sucursales[sucKey].inventario.filter(x=>x.id!==id); saveState(); renderMain(currentView); }
+function setRampa(sucKey,id,val){ const r = sucursales[sucKey].rampas.find(x=>x.id===id); r.estado = val; saveState(); renderMain(currentView); }
+function addRampa(sucKey){ const r = sucursales[sucKey].rampas; r.push({id:(r.length?Math.max(...r.map(x=>x.id))+1:1), estado:'libre'}); saveState(); renderMain(currentView); }
+
+function generarCotizacion(){
+  const cliente = document.getElementById('qCliente').value || 'Cliente';
+  const modelo = document.getElementById('qModelo').value || '—';
+  const checked = [...document.querySelectorAll('.qserv:checked')].map(c=>c.value);
+  if(checked.length===0){ toast('Selecciona al menos un servicio.','warn'); return; }
+  const total = checked.reduce((a,id)=>a+servicios.find(s=>s.id===id).min,0);
+  const box = document.getElementById('qResult');
+  box.classList.remove('hidden');
+  box.innerHTML = `<b>${cliente}</b> — ${modelo}<br>${checked.map(servicioNombre).join(', ')}<br>Tiempo estimado: <span class="est-time">${total} min</span>`;
+}
+function setPago(citaId,val){ /* demo visual */ toast('Estado de pago actualizado.'); }
+
+/* ============================================================
+   CALENDARIO
+============================================================ */
+function renderCalendarView(main){
+  const scope = currentUser.rol==='ceo' ? null : currentUser.sucursal;
+  const base = new Date(); base.setDate(1); base.setMonth(base.getMonth()+calMonthOffset);
+  const year = base.getFullYear(), month = base.getMonth();
+  const firstDow = new Date(year,month,1).getDay();
+  const daysInMonth = new Date(year,month+1,0).getDate();
+  const monthName = base.toLocaleDateString('es-MX',{month:'long',year:'numeric'});
+
+  let cells = '';
+  for(let i=0;i<firstDow;i++) cells += `<div class="cal-day empty"></div>`;
+  for(let d=1; d<=daysInMonth; d++){
+    const dateStr = `${year}-${pad(month+1)}-${pad(d)}`;
+    const count = citas.filter(c => (scope?c.sucursal===scope:true) && c.fecha===dateStr).length;
+    cells += `<div class="cal-day ${dateStr===calSelectedDate?'selected':''}" onclick="selectCalDay('${dateStr}')">
+      <div class="dnum">${d}</div>${count?`<div class="dcount">${count}</div>`:''}</div>`;
+  }
+
+  main.innerHTML = `
+    <h2>Calendario de citas</h2>
+    <div class="sub">${scope ? sucursales[scope].nombre : 'Todas las sucursales (CEO)'}</div>
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <button class="btn btn-outline-light btn-sm" onclick="calMonthOffset--;renderMain('calendario')">← Mes anterior</button>
+        <b style="text-transform:capitalize;">${monthName}</b>
+        <button class="btn btn-outline-light btn-sm" onclick="calMonthOffset++;renderMain('calendario')">Mes siguiente →</button>
+      </div>
+      <div class="cal-wrap">
+        <div style="flex:2;min-width:320px;"><div class="cal-grid">
+          ${['D','L','M','M','J','V','S'].map(d=>`<div class="cal-dow">${d}</div>`).join('')}${cells}
+        </div></div>
+        <div class="day-panel">
+          <h3 style="margin-bottom:10px;">Citas del ${calSelectedDate}</h3>
+          <div id="dayCitasList"></div>
+          <div class="inline-form" style="margin-top:10px;">
+            <div><label>Cliente</label><input type="text" id="ncCliente" placeholder="Nombre"></div>
+            <div><label>Hora</label><input type="time" id="ncHora" value="09:00"></div><div><label>Prioridad</label><select id="ncPriority"><option>Normal</option><option>Media</option><option>Alta</option></select></div>
+            ${!scope ? `<div><label>Sucursal</label><select id="ncSucursal">${Object.entries(sucursales).map(([k,s])=>`<option value="${k}">${s.nombre}</option>`).join('')}</select></div>` : ''}
+            <div class="checks">${servicios.map(s=>`<label><input type="checkbox" class="ncServ" value="${s.id}"> ${s.nombre}</label>`).join('')}</div>
+            <div class="checks"><button class="btn btn-orange btn-sm" onclick="addCitaManual('${scope||''}')">+ Agregar cita</button></div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  renderDayCitas(scope);
+}
+function selectCalDay(dateStr){ calSelectedDate = dateStr; renderMain('calendario'); }
+function renderDayCitas(scope){
+  const list = citas.filter(c => (scope?c.sucursal===scope:true) && c.fecha===calSelectedDate).sort((a,b)=>a.hora.localeCompare(b.hora));
+  document.getElementById('dayCitasList').innerHTML = list.length ? list.map(c=>`
+    <div class="panel" style="padding:10px 12px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;"><b>${c.hora} — ${c.cliente}</b>
+      <button class="icon-btn" onclick="delCita(${c.id})">✕</button></div>
+      <div class="helper">${sucursales[c.sucursal].nombre} · ${c.servicios.map(servicioNombre).join(', ')}</div>
+      <select class="small" style="margin-top:6px;" onchange="setEstadoCita(${c.id},this.value)">
+        ${['Confirmada','Sin confirmar','Cancelada','Completada'].map(op=>`<option ${c.estado===op?'selected':''}>${op}</option>`).join('')}
+      </select>
+    </div>`).join('') : '<p class="helper">Sin citas este día.</p>';
+}
+function addCitaManual(scopeFixed){
+  const cliente = document.getElementById('ncCliente').value.trim();
+  const hora = document.getElementById('ncHora').value;
+  const sucSel = scopeFixed || document.getElementById('ncSucursal').value;
+  const serv = [...document.querySelectorAll('.ncServ:checked')].map(c=>c.value);
+  if(!cliente || !hora || serv.length===0){ toast('Completa cliente, hora y al menos un servicio.','warn'); return; }
+  citas.push({id:newId(), sucursal:sucSel, fecha:calSelectedDate, hora, cliente, telefono:'', servicios:serv, estado:'Confirmada', mecanico:null, clienteEmail:null, progreso:[], llantaId:null});
+  saveState(); toast('Cita agregada.'); renderMain('calendario');
+}
+function delCita(id){ citas = citas.filter(c=>c.id!==id); saveState(); renderMain('calendario'); }
+function setEstadoCita(id,val){ citas.find(c=>c.id===id).estado = val; saveState(); renderMain('calendario'); }
+function cancelarCitaCliente(id){ citas.find(c=>c.id===id).estado = 'Cancelada'; saveState(); renderMain('mis-citas'); }
+
+/* ============================================================
+   CLIENTE: vehículos / perfil
+============================================================ */
+function addVehiculo(){
+  const modelo = document.getElementById('vModelo').value.trim();
+  const llanta = document.getElementById('vLlanta').value.trim();
+  if(!modelo || !llanta){ toast('Completa modelo y medida de llanta.','warn'); return; }
+  clientes[currentUser.email].vehiculos.push({id:newId(), modelo, llanta});
+  saveState(); renderMain('vehiculos');
+}
+function delVehiculo(id){
+  const c = clientes[currentUser.email];
+  c.vehiculos = c.vehiculos.filter(v=>String(v.id)!==String(id));
+  saveState(); renderMain('vehiculos');
+}
+function guardarPerfil(){
+  const c = clientes[currentUser.email];
+  c.nombre = document.getElementById('pNombre').value;
+  c.telefono = document.getElementById('pTelefono').value;
+  currentUser.nombre = c.nombre;
+  document.getElementById('whoName').textContent = c.nombre;
+  saveState(); toast('Perfil actualizado.');
+}
+
+/* ============================================================
+   MECÁNICO — timer por servicio + descuento automático de inventario
+============================================================ */
+function renderAgendaMecanico(main){
+  const sucKey = currentUser.sucursal;
+  const misCitas = citas.filter(c => c.sucursal===sucKey && c.fecha===todayStr() && c.estado!=='Cancelada' && c.estado!=='Completada' && (!c.mecanico || c.mecanico===currentUser.nombre));
+  main.innerHTML = `<h2>Mi agenda de hoy</h2><div class="sub">${currentUser.nombre} · ${sucursales[sucKey].nombre}</div>` +
+    (misCitas.length ? misCitas.map(c=>renderTimerCard(c)).join('') : '<p class="helper">No hay citas pendientes por ahora.</p>') +
+    `<p class="helper">Elige qué servicio vas a empezar. El cronómetro corre mientras trabajas ese servicio; al terminar "Cambio de llanta" se descuenta automáticamente del inventario.</p>`;
+}
+function renderTimerCard(c){
+  const activo = mecTimer && mecTimer.citaId===c.id;
+  const chips = c.servicios.map((sid,idx)=>{
+    const done = c.progreso.find(p=>p.idx===idx);
+    const isActive = activo && mecTimer.servicioIdx===idx;
+    return `<div class="sp-opt ${done?'done':''} ${isActive?'active':''}" onclick="${done?'':`pickServicio(${c.id},${idx})`}">
+      ${servicioNombre(sid)} ${done?`✓ ${done.seg}s`:''}</div>`;
+  }).join('');
+  const clockTxt = activo ? formatClock(mecTimer.seconds) : '00:00';
+  const allDone = c.progreso.length === c.servicios.length;
+  return `<div class="timer-card">
+    <div class="top"><div><div class="cliente">${c.cliente}</div><div class="helper">${c.hora} · ${c.servicios.map(servicioNombre).join(', ')}</div></div>
+    <div class="clock ${activo?'running':''}" id="clock-${c.id}">${clockTxt}</div></div>
+    <div class="service-pick">${chips}</div>
+    <div class="timer-actions">
+      ${activo
+        ? `<button class="btn-stop" onclick="terminarServicio(${c.id})">Terminar servicio actual</button>`
+        : allDone
+          ? `<button class="btn-disabled" disabled>Servicio completo ✓</button>`
+          : `<button class="btn-disabled" disabled>Elige un servicio arriba para iniciar</button>`}
+    </div>
+  </div>`;
+}
+function pickServicio(citaId, idx){
+  if(mecTimer){ toast('Termina el servicio en curso antes de iniciar otro.','warn'); return; }
+  const c = citas.find(x=>x.id===citaId);
+  c.mecanico = currentUser.nombre;
+  if(c.estado==='Sin confirmar') c.estado='Confirmada';
+  mecTimer = {citaId, servicioIdx:idx, seconds:0, handle:null};
+  mecTimer.handle = setInterval(()=>{
+    mecTimer.seconds++;
+    const el = document.getElementById('clock-'+citaId);
+    if(el) el.textContent = formatClock(mecTimer.seconds);
+  },1000);
+  renderMain('agenda');
+}
+function terminarServicio(citaId){
+  const c = citas.find(x=>x.id===citaId);
+  const servicioId = c.servicios[mecTimer.servicioIdx];
+  c.progreso.push({idx:mecTimer.servicioIdx, seg:mecTimer.seconds});
+  clearInterval(mecTimer.handle);
+  mecTimer = null;
+
+  // Descuento automático de inventario si el servicio terminado fue cambio de llanta
+  if(servicioId==='lla' && c.llantaId){
+    const inv = sucursales[c.sucursal].inventario.find(i=>String(i.id)===String(c.llantaId));
+    if(inv){
+      inv.stock = Math.max(0, inv.stock - 4);
+      toast(`Inventario actualizado: se descontaron 4 unidades de ${inv.marca} ${inv.medida} en ${sucursales[c.sucursal].nombre}.`);
+      if(inv.stock <= 3) toast(`Stock bajo de ${inv.marca} ${inv.medida} en ${sucursales[c.sucursal].nombre} (${inv.stock} pzas).`, 'warn');
+    }
+  }
+
+  if(c.progreso.length === c.servicios.length){ c.estado = 'Completada'; toast(`Servicio de ${c.cliente} completado.`); }
+  saveState();
+  renderMain('agenda');
+}
+function formatClock(totalSec){
+  const m = Math.floor(totalSec/60), s = totalSec%60;
+  return `${pad(m)}:${pad(s)}`;
+}
+
+/* ============================================================
+   INICIO
+============================================================ */
+loadState();
+showPublicView('inicio');
+
+/* ============================================================
+   TOCOapp 4.0 — MEJORAS FUNCIONALES PROGRESIVAS
+   Este bloque NO reemplaza la arquitectura de 3.0: la extiende.
+============================================================ */
+let mecanicoStats = {};
+let timerRuntime = null;
+let confirmResolver = null;
+
+function ensureMecStats(name){
+  if(!name)return null;
+  if(!mecanicoStats[name])mecanicoStats[name]={servicios:{},sesiones:[],dias:{}};
+  mecanicoStats[name].servicios ||= {}; mecanicoStats[name].sesiones ||= []; mecanicoStats[name].dias ||= {};
+  return mecanicoStats[name];
+}
+function ensureV4State(){
+  if(!mecanicoStats||typeof mecanicoStats!=='object')mecanicoStats={};
+  Object.values(usuariosStaff||{}).forEach(u=>ensureMecStats(u.nombre));
+  (citas||[]).forEach(c=>{c.progreso ||= [];c.priority ||= 'Normal';c.progreso.forEach(p=>{if(p.deadSec==null)p.deadSec=0;});});
+}
+const _saveStateV3=saveState;
+saveState=function(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({sucursales,citas,usuariosStaff,clientes,nextId,mecanicoStats}));localStorage.setItem(STORAGE_KEY+'_meta',JSON.stringify({version:4,updatedAt:new Date().toISOString()}));}catch(e){console.warn('TOCOapp: no se pudo guardar',e);}};
+const _loadStateV3=loadState;
+loadState=function(){_loadStateV3();try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const d=JSON.parse(raw);mecanicoStats=d.mecanicoStats||{};}}catch(e){console.warn('TOCOapp: estado V4 inválido',e);}ensureV4State();};
+
+/* ---------- Confirmación modal reutilizable ---------- */
+function openConfirm(title,message){return new Promise(resolve=>{confirmResolver=resolve;const o=document.getElementById('confirmOverlay');if(!o){resolve(false);return;}document.getElementById('confirmTitle').textContent=title||'Confirmar acción';document.getElementById('confirmMessage').textContent=message||'¿Estás seguro? Esta acción no se puede deshacer.';o.classList.remove('hidden');});}
+function closeConfirm(value){const o=document.getElementById('confirmOverlay');if(o)o.classList.add('hidden');if(confirmResolver){const r=confirmResolver;confirmResolver=null;r(!!value);}}
+async function delPersonalV4(sucKey,id){const m=sucursales[sucKey]?.mecanicos.find(x=>x.id===id);if(!m)return;if(await openConfirm('Eliminar personal',`¿Eliminar a ${m.nombre}? Esta acción no se puede deshacer.`))delPersonal(sucKey,id);}
+async function delInventarioV4(sucKey,id){const i=sucursales[sucKey]?.inventario.find(x=>x.id===id);if(!i)return;if(await openConfirm('Eliminar modelo de llanta',`¿Eliminar ${i.marca} ${i.medida}? Esta acción no se puede deshacer.`))delInventario(sucKey,id);}
+async function delCitaV4(id){const c=citas.find(x=>x.id===id);if(!c)return;if(await openConfirm('Eliminar cita',`¿Eliminar la cita de ${c.cliente} del ${c.fecha} a las ${c.hora}? Esta acción no se puede deshacer.`))delCita(id);}
+
+/* ---------- Edición rápida de personal ---------- */
+function editPersonalField(sucKey,id,field){const m=sucursales[sucKey]?.mecanicos.find(x=>x.id===id);const cell=document.getElementById(`pf-${sucKey}-${id}-${field}`);if(!m||!cell)return;const old=String(m[field]||'');cell.innerHTML=`<input class="inline-edit" value="${escapeHtml(old)}" onkeydown="if(event.key==='Enter'){event.preventDefault();commitPersonalField('${sucKey}',${id},'${field}',this.value)};if(event.key==='Escape')renderMain('personal')" onblur="commitPersonalField('${sucKey}',${id},'${field}',this.value)">`;const input=cell.querySelector('input');input.focus();input.select();}
+function commitPersonalField(sucKey,id,field,value){const m=sucursales[sucKey]?.mecanicos.find(x=>x.id===id);if(!m)return;value=String(value||'').trim();if(!value){toast('El nombre no puede quedar vacío.','warn');renderMain('personal');return;}if(field==='nombre'&&value!==m.nombre){const oldName=m.nombre;if(mecanicoStats[oldName]&&!mecanicoStats[value])mecanicoStats[value]=mecanicoStats[oldName];delete mecanicoStats[oldName];Object.values(usuariosStaff).forEach(u=>{if(u.nombre===oldName)u.nombre=value;});}m[field]=value;saveState();renderMain('personal');toast('Dato de personal guardado.');}
+
+/* ---------- Estadísticas acumulativas ---------- */
+function formatDuration(sec){sec=Math.max(0,Math.round(sec||0));const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=sec%60;return h?`${pad(h)}:${pad(m)}:${pad(s)}`:`${pad(m)}:${pad(s)}`;}
+function avgSec(x){return x&&x.count?Math.round(x.totalSec/x.count):0;}
+function statsForMechanic(name){return ensureMecStats(name);}
+function renderStatsView(main){
+ const isCeo=currentUser.rol==='ceo';const names=Object.values(usuariosStaff).filter(u=>u.rol==='mecanico'||u.rol==='pasante').filter(u=>isCeo||u.sucursal===currentUser.sucursal);let total=0,totalSec=0,totalDead=0,sessions=0;
+ names.forEach(u=>{const st=statsForMechanic(u.nombre);sessions+=(st.sesiones||[]).length;Object.values(st.servicios||{}).forEach(x=>{total+=x.count;totalSec+=x.totalSec;totalDead+=x.totalDead||0;});});
+ main.innerHTML=`<h2>Estadísticas de personal</h2><div class="sub">Rendimiento acumulado a partir de TOCOtimer · ${isCeo?'visión global':'visión de sucursal'}</div><div class="stats-grid"><div class="metric-card"><div class="metric-value">${total}</div><div class="metric-label">Servicios registrados</div></div><div class="metric-card"><div class="metric-value">${formatDuration(total?totalSec/total:0)}</div><div class="metric-label">Promedio real por servicio</div></div><div class="metric-card"><div class="metric-value">${formatDuration(totalDead)}</div><div class="metric-label">Tiempo muerto acumulado</div></div><div class="metric-card"><div class="metric-value">${sessions}</div><div class="metric-label">Sesiones terminadas</div></div></div><div class="panel"><h3>Desempeño por mecánico</h3>${names.length?names.map(u=>{const st=statsForMechanic(u.nombre),e=Object.entries(st.servicios||{}),count=e.reduce((n,[,x])=>n+x.count,0),sec=e.reduce((n,[,x])=>n+x.totalSec,0),dead=e.reduce((n,[,x])=>n+(x.totalDead||0),0);return `<div class="panel" style="margin-bottom:10px;padding:14px;"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;"><b>${escapeHtml(u.nombre)}</b><span class="pill ${u.estado==='Disponible'?'ok':'warn'}">${escapeHtml(u.estado||'Disponible')}</span></div><div class="stats-grid" style="margin:12px 0 0;grid-template-columns:repeat(4,minmax(0,1fr));"><div class="metric-card"><div class="metric-value">${count}</div><div class="metric-label">Servicios</div></div><div class="metric-card"><div class="metric-value">${formatDuration(count?sec/count:0)}</div><div class="metric-label">Promedio</div></div><div class="metric-card"><div class="metric-value">${formatDuration(dead)}</div><div class="metric-label">Tiempo muerto</div></div><div class="metric-card"><div class="metric-value">${e.length}</div><div class="metric-label">Tipos de servicio</div></div></div>${e.length?twrap(`<table class="data"><tr><th>Servicio</th><th>Veces</th><th>Promedio</th><th>Tiempo muerto</th></tr>${e.map(([sid,x])=>`<tr><td>${servicioNombre(sid)}</td><td>${x.count}</td><td>${formatDuration(avgSec(x))}</td><td class="dead-time">${formatDuration(x.totalDead||0)}</td></tr>`).join('')}</table>`):'<p class="helper">Aún no hay servicios registrados para este colaborador.</p>'}</div>`;}).join(''):'<p class="helper">No hay personal para mostrar.</p>'}</div>`;
+}
+
+/* ---------- TOCOtimer: cada servicio tiene Start / Pausa / Reanudar / End ---------- */
+function getProgress(c,idx){return(c.progreso||[]).find(p=>Number(p.idx)===Number(idx));}
+function activeElapsed(rt){if(!rt)return 0;return(rt.elapsedSec||0)+(rt.runningSince?Math.max(0,Math.floor((Date.now()-rt.runningSince)/1000)):0);}
+function deadElapsed(rt){if(!rt)return 0;return(rt.deadSec||0)+(rt.pausedSince?Math.max(0,Math.floor((Date.now()-rt.pausedSince)/1000)):0);}
+function persistRuntime(){if(timerRuntime){const copy={...timerRuntime,elapsedSec:activeElapsed(timerRuntime),deadSec:deadElapsed(timerRuntime)};localStorage.setItem(STORAGE_KEY+'_runtime',JSON.stringify(copy));}else localStorage.removeItem(STORAGE_KEY+'_runtime');}
+function restoreRuntime(){try{const raw=localStorage.getItem(STORAGE_KEY+'_runtime');if(!raw)return;const r=JSON.parse(raw),c=citas.find(x=>x.id===r.citaId);if(!c)return;timerRuntime=r;}catch(e){localStorage.removeItem(STORAGE_KEY+'_runtime');}}
+function startServicio(citaId,idx){if(timerRuntime){toast('Termina o pausa el servicio que está en curso.','warn');return;}const c=citas.find(x=>x.id===citaId);if(!c||getProgress(c,idx))return;c.mecanico=currentUser.nombre;if(c.estado==='Sin confirmar')c.estado='Confirmada';timerRuntime={citaId,servicioIdx:idx,elapsedSec:0,deadSec:0,runningSince:Date.now(),pausedSince:null};ensureMecStats(currentUser.nombre);setRampForAppointment(c,true);saveState();persistRuntime();renderMain('agenda');toast(`Inició: ${servicioNombre(c.servicios[idx])}`);}
+function pauseServicio(){if(!timerRuntime)return;if(timerRuntime.pausedSince){toast('Ya está en tiempo muerto.','warn');return;}timerRuntime.elapsedSec=activeElapsed(timerRuntime);timerRuntime.runningSince=null;timerRuntime.pausedSince=Date.now();persistRuntime();renderMain('agenda');toast('Tiempo muerto iniciado.','warn');}
+function resumeServicio(){if(!timerRuntime?.pausedSince)return;timerRuntime.deadSec=deadElapsed(timerRuntime);timerRuntime.pausedSince=null;timerRuntime.runningSince=Date.now();persistRuntime();renderMain('agenda');toast('Cronómetro reanudado.');}
+function endServicio(){if(!timerRuntime)return;const rt=timerRuntime,c=citas.find(x=>x.id===rt.citaId);if(!c)return;const active=activeElapsed(rt),dead=deadElapsed(rt),idx=rt.servicioIdx,sid=c.servicios[idx];c.progreso ||= [];c.progreso.push({idx,seg:active,deadSec:dead,terminadoEn:new Date().toISOString(),mecanico:currentUser.nombre});const st=ensureMecStats(currentUser.nombre);st.servicios[sid] ||= {count:0,totalSec:0,totalDead:0};st.servicios[sid].count++;st.servicios[sid].totalSec+=active;st.servicios[sid].totalDead+=dead;const day=c.fecha||todayStr();st.dias[day]=(st.dias[day]||0)+1;st.sesiones.push({citaId:c.id,servicioId:sid,fecha:day,activeSec:active,deadSec:dead,terminadoEn:new Date().toISOString()});if(sid==='lla'&&c.llantaId){const inv=sucursales[c.sucursal]?.inventario.find(i=>String(i.id)===String(c.llantaId));if(inv){inv.stock=Math.max(0,inv.stock-4);if(inv.stock<=3)toast(`Stock bajo: ${inv.marca} ${inv.medida} (${inv.stock} pzas).`,'warn');}}timerRuntime=null;localStorage.removeItem(STORAGE_KEY+'_runtime');if(c.progreso.length>=c.servicios.length){c.estado='Completada';setRampForAppointment(c,false);toast(`Servicio de ${c.cliente} completado.`);}else toast(`${servicioNombre(sid)} terminado en ${formatDuration(active)} (muerto: ${formatDuration(dead)}).`);saveState();renderMain('agenda');}
+function setRampForAppointment(c,occupied){const suc=sucursales[c.sucursal];if(!suc?.rampas?.length)return;if(occupied&&!c.rampaId){const r=suc.rampas.find(x=>x.estado==='libre');if(r){r.estado='ocupada';c.rampaId=r.id;}}else if(!occupied&&c.rampaId){const r=suc.rampas.find(x=>x.id===c.rampaId);if(r&&r.estado==='ocupada')r.estado='libre';c.rampaId=null;}}
+function renderTimerCardV4(c){const done=(c.progreso||[]).length,active=timerRuntime&&timerRuntime.citaId===c.id,priority=c.priority||'Normal';const rows=c.servicios.map((sid,idx)=>{const p=getProgress(c,idx),isActive=active&&timerRuntime.servicioIdx===idx;return `<div class="timer-service-row ${isActive?'active':''}"><div><b>${escapeHtml(servicioNombre(sid))}</b><div class="helper">${p?'Finalizado':'Pendiente'}</div></div><div class="service-timing">${p?`<div>Activo <b>${formatDuration(p.seg)}</b></div><div class="dead-time">Muerto ${formatDuration(p.deadSec)}</div>`:isActive?`<b>${formatDuration(activeElapsed(timerRuntime))}</b>`:'—'}</div><div>${p?'<span class="pill ok">✓ End</span>':isActive?'<span class="pill warn">En curso</span>':`<button class="btn btn-neon btn-sm" onclick="startServicio(${c.id},${idx})" ${timerRuntime?'disabled':''}>▶ Start</button>`}</div></div>`;}).join('');return `<div class="timer-card"><div class="top"><div><div class="cliente">${escapeHtml(c.cliente)}</div><div class="helper">${escapeHtml(c.hora)} · ${c.rampaId?`Rampa ${c.rampaId} · `:''}${c.servicios.map(servicioNombre).join(', ')}</div></div><span class="priority-pill priority-${priority.toLowerCase()}">${priority==='Alta'?'🔴':priority==='Media'?'🟡':'🟢'} ${priority}</span></div><div style="margin-top:10px;">${rows}</div><div class="helper" style="margin-top:8px;">${done}/${c.servicios.length} servicios terminados</div></div>`;}
+function renderAgendaMecanicoV4(main){const sucKey=currentUser.sucursal,mis=citas.filter(c=>c.sucursal===sucKey&&c.fecha===todayStr()&&c.estado!=='Cancelada'&&c.estado!=='Completada'&&(!c.mecanico||c.mecanico===currentUser.nombre)).sort((a,b)=>String(a.hora).localeCompare(String(b.hora)));const rt=timerRuntime;const activeC=rt?citas.find(c=>c.id===rt.citaId):null;main.innerHTML=`<h2>Mi agenda de hoy</h2><div class="sub">${escapeHtml(currentUser.nombre)} · ${escapeHtml(sucursales[sucKey].nombre)} · timings guardados automáticamente</div>${rt?`<div class="panel" style="border-color:var(--neon);"><h3>Servicio en curso <span class="pill ${rt.pausedSince?'warn':'ok'}">${rt.pausedSince?'TIEMPO MUERTO':'EN CURSO'}</span></h3><div>${escapeHtml(activeC?.cliente||'Cliente')} · ${servicioNombre(activeC?.servicios?.[rt.servicioIdx])}</div><div class="clock" style="font-size:42px;text-align:center;">${formatDuration(activeElapsed(rt))}</div><div class="helper" style="text-align:center;">Tiempo muerto: <b class="dead-time">${formatDuration(deadElapsed(rt))}</b></div><div class="timer-control"><button class="btn btn-orange" onclick="${rt.pausedSince?'resumeServicio()':'pauseServicio()'}">${rt.pausedSince?'▶ Reanudar':'⏸ Pausar / tiempo muerto'}</button><button class="btn btn-neon" onclick="endServicio()">✓ End — guardar timing</button></div></div>`:''}${mis.length?mis.map(renderTimerCardV4).join(''):'<p class="helper">No hay citas pendientes por ahora.</p>'}<div class="panel"><h3>Cómo se mide</h3><p class="helper" style="font-size:12px;line-height:1.6;">Cada servicio de una cita se cronometra por separado. El tiempo activo y el tiempo muerto se almacenan al terminar. Al completar Cambio de llanta se descuentan 4 piezas del inventario y al terminar la cita se libera la rampa asignada.</p></div>`;startRuntimeTicker();}
+function startRuntimeTicker(){if(window._tocoTicker)clearInterval(window._tocoTicker);if(!timerRuntime)return;window._tocoTicker=setInterval(()=>{const clocks=document.querySelectorAll('.clock');if(clocks[clocks.length-1])clocks[clocks.length-1].textContent=formatDuration(activeElapsed(timerRuntime));},1000);}
+
+/* ---------- Autocompletado ---------- */
+function setupAutocomplete(inputId,items){const input=document.getElementById(inputId);if(!input)return;const wrap=input.parentElement;wrap.classList.add('autocomplete-wrap');let list=document.getElementById(inputId+'-ac');if(!list){list=document.createElement('div');list.id=inputId+'-ac';list.className='autocomplete-list';wrap.appendChild(list);}const unique=[...new Set(items.filter(Boolean).map(String))];const render=()=>{const q=input.value.toLowerCase().trim(),hits=unique.filter(x=>!q||x.toLowerCase().includes(q)).slice(0,8);list.innerHTML=hits.map(x=>`<div class="autocomplete-item" data-v="${escapeHtml(x)}">${escapeHtml(x)}</div>`).join('');list.classList.toggle('show',hits.length>0);list.querySelectorAll('.autocomplete-item').forEach(e=>e.onclick=()=>{input.value=e.dataset.v;list.classList.remove('show');});};input.addEventListener('input',render);input.addEventListener('focus',render);document.addEventListener('click',e=>{if(!wrap.contains(e.target))list.classList.remove('show');});}
+function autocompleteModels(){return [...Object.values(clientes||{}).flatMap(c=>(c.vehiculos||[]).map(v=>v.modelo)),...citas.map(c=>c.modeloAuto).filter(Boolean)];}
+function autocompleteTires(){return Object.values(sucursales||{}).flatMap(s=>(s.inventario||[]).map(i=>`${i.marca} ${i.medida}`));}
+function validateLive(inputId,kind){const el=document.getElementById(inputId);if(!el)return;let ok=true,msg='';if(kind==='email'){ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value);msg=ok?'Correo válido':'Escribe un correo válido.';}else{ok=el.value.trim().length>1;msg=ok?'Listo':'Este campo es obligatorio.';}el.classList.toggle('form-valid',ok);el.classList.toggle('form-invalid',!ok);let m=document.getElementById(inputId+'-validation');if(!m){m=document.createElement('div');m.id=inputId+'-validation';m.className='validation-msg';el.after(m);}m.className='validation-msg '+(ok?'ok':'error');m.textContent=msg;}
+
+/* ---------- Vistas nuevas sin romper las anteriores ---------- */
+const _renderMainBase=renderMain;
+renderMain=function(view){if(view==='estadisticas')return renderStatsView(document.getElementById('mainPanel'));if(view==='agenda'&&currentUser?.tipo!=='cliente')return renderAgendaMecanicoV4(document.getElementById('mainPanel'));if(view==='personal')return renderPersonalV4(document.getElementById('mainPanel'));_renderMainBase(view);if(view==='cotizar')setupAutocomplete('qModelo',autocompleteModels());};
+const _renderSidebarBase=renderSidebar;
+renderSidebar=function(){_renderSidebarBase();if(currentUser?.tipo!=='cliente'&&(currentUser.rol==='ceo'||currentUser.rol==='gerente'||currentUser.rol==='mecanico'||currentUser.rol==='pasante')){const sb=document.getElementById('sidebar'),a=document.createElement('a');a.dataset.key='estadisticas';a.textContent=currentUser.rol==='mecanico'||currentUser.rol==='pasante'?'Mis estadísticas':'Estadísticas';a.onclick=()=>selectNav(a,'estadisticas');sb.appendChild(a);}};
+function renderPersonalV4(main){const scope=currentUser.rol==='ceo'?sucursales:{[currentUser.sucursal]:sucursales[currentUser.sucursal]};main.innerHTML=`<h2>Personal</h2><div class="sub">Edición rápida · estado operativo · rendimiento acumulado</div>`+Object.entries(scope).map(([key,s])=>`<div class="panel"><h3>${escapeHtml(s.nombre)} <span class="helper">${s.mecanicos.length} colaboradores</span></h3>${twrap(`<table class="data"><tr><th>Nombre</th><th>Rol</th><th>Estado</th><th>Servicios</th><th>Promedio</th><th></th></tr>${s.mecanicos.map(m=>{const st=statsForMechanic(m.nombre),e=Object.values(st.servicios||{}),count=e.reduce((n,x)=>n+x.count,0),avg=count?e.reduce((n,x)=>n+x.totalSec,0)/count:0;return `<tr><td id="pf-${key}-${m.id}-nombre" class="editable-cell" onclick="editPersonalField('${key}',${m.id},'nombre')">${escapeHtml(m.nombre)}</td><td id="pf-${key}-${m.id}-rol" class="editable-cell" onclick="editPersonalField('${key}',${m.id},'rol')">${escapeHtml(m.rol)}</td><td><select class="small" onchange="setEstadoPersonal('${key}',${m.id},this.value)">${['Disponible','En servicio','Descanso','Fuera de turno'].map(op=>`<option ${m.estado===op?'selected':''}>${op}</option>`).join('')}</select></td><td>${count}</td><td>${formatDuration(avg)}</td><td><button class="icon-btn" onclick="delPersonalV4('${key}',${m.id})">✕</button></td></tr>`;}).join('')}</table>`)}<div class="inline-form" style="margin-top:14px;"><div><label>Nombre</label><input type="text" id="np-${key}" placeholder="Nombre completo"></div><div><label>Rol</label><select id="nr-${key}"><option>Mecánico</option><option>Pasante</option><option>Facturista</option><option>Jefe de patio</option></select></div><div class="checks"><button class="btn btn-orange btn-sm" onclick="addPersonal('${key}')">+ Agregar personal</button></div></div></div>`).join('');}
+
+/* Inventario: reemplaza solo la acción de borrado por el modal seguro. */
+const _renderInventarioBase=renderInventarioView;
+renderInventarioView=function(main){_renderInventarioBase(main);main.querySelectorAll('button.icon-btn').forEach(btn=>{const old=btn.getAttribute('onclick')||'';if(old.startsWith('delInventario('))btn.setAttribute('onclick',old.replace('delInventario(','delInventarioV4('));});};
+
+/* Calendario: drag & drop entre citas para intercambiar horarios sin tocar la estructura mensual. */
+const _renderDayCitasBase=renderDayCitas;
+renderDayCitas=function(scope){_renderDayCitasBase(scope);const list=citas.filter(c=>(scope?c.sucursal===scope:true)&&c.fecha===calSelectedDate).sort((a,b)=>a.hora.localeCompare(b.hora));document.querySelectorAll('#dayCitasList .panel').forEach((el,i)=>{const c=list[i];if(!c)return;el.draggable=true;el.classList.add('drag-appointment');el.ondragstart=e=>e.dataTransfer.setData('text/plain',String(c.id));el.ondragover=e=>e.preventDefault();el.ondrop=e=>{e.preventDefault();const from=citas.find(x=>x.id===Number(e.dataTransfer.getData('text/plain'))),to=citas.find(x=>x.id===c.id);if(from&&to&&from.id!==to.id){[from.hora,to.hora]=[to.hora,from.hora];saveState();renderMain('calendario');toast('Horarios intercambiados y guardados.');}};});};
+
+/* Prioridad manual: el control ya se agrega al HTML de calendario; aquí se asegura el valor persistente. */
+const _addCitaManualBase=addCitaManual;
+addCitaManual=function(scopeFixed){const before=citas.length;_addCitaManualBase(scopeFixed);if(citas.length>before){const c=citas[citas.length-1],p=document.getElementById('ncPriority');c.priority=p?.value||'Normal';saveState();}};
+
+/* Escapa texto dinámico antes de insertarlo en HTML. */
+function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+
+(function injectV4UI(){
+ if(!document.getElementById('confirmOverlay'))document.body.insertAdjacentHTML('beforeend',`<div class="overlay hidden" id="confirmOverlay"><div class="modal confirm-modal"><div class="modal-head"><h3 id="confirmTitle">Confirmar acción</h3><button class="modal-close" onclick="closeConfirm(false)">✕</button></div><div class="modal-body"><div class="confirm-icon">⚠️</div><p id="confirmMessage" style="margin:0;color:var(--text-main);line-height:1.6;">¿Estás seguro? Esta acción no se puede deshacer.</p><div class="confirm-actions"><button class="btn btn-outline-light" onclick="closeConfirm(false)">Cancelar</button><button class="btn btn-orange" onclick="closeConfirm(true)">Sí, eliminar</button></div></div></div></div>`);
+ ['cEmail','clLoginEmail'].forEach(id=>{const e=document.getElementById(id);if(e)e.addEventListener('input',()=>validateLive(id,'email'));});
+})();
+
+ensureV4State();restoreRuntime();
+
+/* ---------- Alta de personal: crea también su cuenta de acceso ---------- */
+const _addPersonalBase=addPersonal;
+addPersonal=function(sucKey){
+  const nombre=document.getElementById('np-'+sucKey)?.value.trim();
+  const rol=document.getElementById('nr-'+sucKey)?.value;
+  if(!nombre){toast('Escribe el nombre.','warn');return;}
+  const yaExiste=Object.values(usuariosStaff).some(u=>u.nombre.toLowerCase()===nombre.toLowerCase());
+  _addPersonalBase(sucKey);
+  if(!yaExiste && (rol==='Mecánico'||rol==='Pasante')){
+    const base=nombre.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'.').replace(/^\.|\.$/g,'')||('personal'+newId());
+    let username=base, n=2;while(usuariosStaff[username])username=`${base}${n++}`;
+    const pass='Toco'+Math.floor(1000+Math.random()*9000);
+    usuariosStaff[username]={pass,rol:rol==='Mecánico'?'mecanico':'pasante',nombre,sucursal:sucKey};
+    ensureMecStats(nombre);saveState();toast(`Cuenta creada: ${username} · contraseña temporal: ${pass}`,'ok');
+  }
+};
+
+/* ---------- Inventario: click-to-edit para marca, medida y stock ---------- */
+function commitInventoryField(sucKey,id,field,value){const i=sucursales[sucKey]?.inventario.find(x=>x.id===id);if(!i)return;value=String(value||'').trim();if(field==='stock'){value=Math.max(0,parseInt(value)||0);}if(!value&&field!=='stock'){toast('El dato no puede quedar vacío.','warn');renderMain('inventario');return;}i[field]=value;saveState();renderMain('inventario');toast('Inventario guardado.');}
+function makeInventoryEditable(main){
+  const rows=[...main.querySelectorAll('table.data tr')].slice(1);let n=0;
+  Object.entries(sucursales).forEach(([key,suc])=>{if(invFilterSuc!=='todas'&&invFilterSuc!==key)return;suc.inventario.forEach(item=>{if(invFilterQuery&&!(`${item.marca} ${item.medida}`.toLowerCase().includes(invFilterQuery.toLowerCase())))return;const row=rows[n++];if(!row)return;[1,2].forEach((col,idx)=>{const field=idx===0?'marca':'medida',cell=row.cells[col];if(!cell)return;cell.classList.add('editable-cell');cell.title='Clic para editar';cell.onclick=()=>{if(cell.querySelector('input'))return;const old=item[field];cell.innerHTML=`<input class="inline-edit" value="${escapeHtml(old)}" onkeydown="if(event.key==='Enter'){event.preventDefault();commitInventoryField('${key}',${item.id},'${field}',this.value)};if(event.key==='Escape')renderMain('inventario')" onblur="commitInventoryField('${key}',${item.id},'${field}',this.value)">`;const inp=cell.querySelector('input');inp.focus();inp.select();};});const stockCell=row.cells[3];if(stockCell&&((currentUser.rol==='ceo')||key===currentUser.sucursal)){const inp=stockCell.querySelector('input');if(inp){inp.classList.add('inline-edit');inp.title='Enter para guardar';inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();commitInventoryField(key,item.id,'stock',inp.value);}if(e.key==='Escape')renderMain('inventario');};inp.onblur=()=>commitInventoryField(key,item.id,'stock',inp.value);}}});});
+}
+const _renderInventarioV4a=renderInventarioView;
+renderInventarioView=function(main){_renderInventarioV4a(main);main.querySelectorAll('button.icon-btn').forEach(btn=>{const old=btn.getAttribute('onclick')||'';if(old.startsWith('delInventario('))btn.setAttribute('onclick',old.replace('delInventario(','delInventarioV4('));});makeInventoryEditable(main);};
+
+/* ---------- Citas: prioridad visible + datos de rampa ---------- */
+const _renderDayCitasV4a=renderDayCitas;
+renderDayCitas=function(scope){_renderDayCitasV4a(scope);const list=citas.filter(c=>(scope?c.sucursal===scope:true)&&c.fecha===calSelectedDate).sort((a,b)=>a.hora.localeCompare(b.hora));document.querySelectorAll('#dayCitasList .panel').forEach((el,i)=>{const c=list[i];if(!c)return;const title=el.querySelector('b');if(title){const p=c.priority||'Normal';title.insertAdjacentHTML('afterend',` <span class="priority-pill priority-${p.toLowerCase()}">${p}</span>`);}if(c.rampaId){const h=el.querySelector('.helper');if(h)h.innerHTML+=` · Rampa ${c.rampaId}`;}el.draggable=true;el.classList.add('drag-appointment');el.ondragstart=e=>e.dataTransfer.setData('text/plain',String(c.id));el.ondragover=e=>e.preventDefault();el.ondrop=e=>{e.preventDefault();const from=citas.find(x=>x.id===Number(e.dataTransfer.getData('text/plain'))),to=citas.find(x=>x.id===c.id);if(from&&to&&from.id!==to.id){[from.hora,to.hora]=[to.hora,from.hora];saveState();renderMain('calendario');toast('Horarios intercambiados y guardados.');}};});};
+
+/* ---------- Más validación visual en el flujo de cuenta ---------- */
+function attachLiveValidation(){['cName','cPhone','cEmail','cPass','clLoginEmail','clLoginPass'].forEach(id=>{const e=document.getElementById(id);if(!e||e.dataset.v4)return;e.dataset.v4='1';e.addEventListener('input',()=>validateLive(id,id.toLowerCase().includes('email')?'email':'required'));});}
+const _openBookingV4=openBooking;openBooking=function(){_openBookingV4();setTimeout(attachLiveValidation,0);};
+
+/* ---------- Al arrancar: migración y recuperación de sesión activa ---------- */
+ensureV4State();restoreRuntime();
+
+</script>
+</body>
+</html>
